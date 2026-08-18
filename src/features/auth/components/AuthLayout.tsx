@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Box, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
-import { GarmentVisual } from '@/components/ui/GarmentVisual'
+import { EmojiTile } from '@/components/ui/EmojiTile'
 import { MOCK_GARMENTS } from '@/lib/mockData'
 
 const FLOATERS = [
@@ -41,7 +41,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
               transition={{ duration: 6 + i, repeat: Infinity, ease: 'easeInOut' }}
               sx={{ transform: `rotate(${f.rotate}deg)`, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.28))' }}
             >
-              <GarmentVisual garment={f.g} ratio="3 / 4" radius={18} />
+              <EmojiTile category={f.g.category} colors={f.g.colors} ratio="3 / 4" radius={18} />
             </Box>
           </Box>
         ))}

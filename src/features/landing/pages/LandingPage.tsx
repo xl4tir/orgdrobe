@@ -9,10 +9,8 @@ import { motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { GradientText } from '@/components/ui/GradientText'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { GarmentVisual } from '@/components/ui/GarmentVisual'
-import { OutfitVisual } from '@/components/ui/OutfitVisual'
+import { EmojiTile } from '@/components/ui/EmojiTile'
 import { useAuthStore } from '@/features/auth/store'
-import { MOCK_GARMENTS, MOCK_OUTFITS } from '@/lib/mockData'
 import { staggerContainer, riseItem } from '@/theme/motion'
 
 const FEATURES = [
@@ -60,10 +58,13 @@ export function LandingPage() {
   const navigate = useNavigate()
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
-  const heroGarments = [MOCK_GARMENTS[0], MOCK_GARMENTS[6], MOCK_GARMENTS[8]]
-  const heroOutfitPieces = MOCK_OUTFITS[2].garmentIds
-    .map((id) => MOCK_GARMENTS.find((g) => g.id === id))
-    .filter((g): g is NonNullable<typeof g> => Boolean(g))
+  const heroTiles = [
+    { category: 'tops' as const, colors: ['sky', 'denim'], pos: { top: '0%', left: '2%' }, w: '31%', r: -9, d: 0 },
+    { category: 'outerwear' as const, colors: ['camel', 'sand'], pos: { top: '9%', left: '37%' }, w: '31%', r: 7, d: 0.08 },
+    { category: 'accessories' as const, colors: ['forest', 'sage'], pos: { top: '1%', right: '1%' }, w: '28%', r: -5, d: 0.16 },
+    { category: 'dresses' as const, colors: ['burgundy', 'plum'], pos: { bottom: '0%', left: '13%' }, w: '31%', r: 8, d: 0.24 },
+    { category: 'footwear' as const, colors: ['white', 'stone'], pos: { bottom: '6%', right: '6%' }, w: '30%', r: -11, d: 0.32 },
+  ]
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -143,44 +144,29 @@ export function LandingPage() {
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ position: 'relative', height: { xs: 340, md: 460 } }}>
-              {/* floating garments */}
-              {heroGarments.map((g, i) => {
-                const pos = [
-                  { top: '2%', left: '6%', w: '38%', r: -8 },
-                  { top: '24%', right: '4%', w: '40%', r: 7 },
-                  { bottom: '2%', left: '22%', w: '38%', r: -4 },
-                ][i]
-                return (
+            <Box sx={{ position: 'relative', height: { xs: 360, md: 480 } }}>
+              {heroTiles.map((tile, i) => (
+                <Box
+                  key={tile.category}
+                  component={motion.div}
+                  initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.25 + tile.d, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  sx={{ position: 'absolute', ...tile.pos, width: tile.w, zIndex: i + 1 }}
+                >
                   <Box
-                    key={g.id}
                     component={motion.div}
-                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    sx={{ position: 'absolute', ...pos, width: pos.w, zIndex: i + 1 }}
+                    animate={{ y: [0, -14, 0] }}
+                    transition={{ duration: 5.5 + i, repeat: Infinity, ease: 'easeInOut' }}
+                    sx={{
+                      transform: `rotate(${tile.r}deg)`,
+                      filter: 'drop-shadow(0 24px 48px rgba(27,23,18,0.18))',
+                    }}
                   >
-                    <Box
-                      component={motion.div}
-                      animate={{ y: [0, -16, 0] }}
-                      transition={{ duration: 6 + i, repeat: Infinity, ease: 'easeInOut' }}
-                      sx={{ transform: `rotate(${pos.r}deg)`, filter: 'drop-shadow(0 24px 48px rgba(27,23,18,0.22))' }}
-                    >
-                      <GarmentVisual garment={g} ratio="3 / 4" radius={20} />
-                    </Box>
+                    <EmojiTile category={tile.category} colors={tile.colors} ratio="3 / 4" radius={22} />
                   </Box>
-                )
-              })}
-              {/* central outfit card */}
-              <Box
-                component={motion.div}
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                sx={{ position: 'absolute', top: '30%', left: '32%', width: '36%', zIndex: 5, display: { xs: 'none', md: 'block' }, filter: 'drop-shadow(0 30px 60px rgba(102,80,230,0.3))' }}
-              >
-                <OutfitVisual garments={heroOutfitPieces} layout="canvas" ratio="3 / 4" />
-              </Box>
+                </Box>
+              ))}
             </Box>
           </Grid>
         </Grid>
