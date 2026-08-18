@@ -58,12 +58,13 @@ export function LandingPage() {
   const navigate = useNavigate()
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
+  // Casually tossed, tilted cards with only light corner overlap — a playful scatter.
   const heroTiles = [
-    { category: 'tops' as const, colors: ['sky', 'denim'], pos: { top: '0%', left: '2%' }, w: '31%', r: -9, d: 0 },
-    { category: 'outerwear' as const, colors: ['camel', 'sand'], pos: { top: '9%', left: '37%' }, w: '31%', r: 7, d: 0.08 },
-    { category: 'accessories' as const, colors: ['forest', 'sage'], pos: { top: '1%', right: '1%' }, w: '28%', r: -5, d: 0.16 },
-    { category: 'dresses' as const, colors: ['burgundy', 'plum'], pos: { bottom: '0%', left: '13%' }, w: '31%', r: 8, d: 0.24 },
-    { category: 'footwear' as const, colors: ['white', 'stone'], pos: { bottom: '6%', right: '6%' }, w: '30%', r: -11, d: 0.32 },
+    { category: 'tops' as const, colors: ['sky', 'denim'], pos: { top: '2%', left: '3%' }, w: '37%', r: -12, z: 2, d: 0 },
+    { category: 'dresses' as const, colors: ['burgundy', 'plum'], pos: { top: '0%', right: '4%' }, w: '37%', r: 10, z: 3, d: 0.08 },
+    { category: 'outerwear' as const, colors: ['camel', 'sand'], pos: { top: '34%', left: '31%' }, w: '38%', r: -4, z: 5, d: 0.16 },
+    { category: 'footwear' as const, colors: ['white', 'stone'], pos: { bottom: '1%', left: '2%' }, w: '36%', r: 13, z: 4, d: 0.24 },
+    { category: 'accessories' as const, colors: ['forest', 'sage'], pos: { bottom: '0%', right: '3%' }, w: '37%', r: -11, z: 1, d: 0.32 },
   ]
 
   return (
@@ -152,7 +153,7 @@ export function LandingPage() {
                   initial={{ opacity: 0, y: 40, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ delay: 0.25 + tile.d, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                  sx={{ position: 'absolute', ...tile.pos, width: tile.w, zIndex: i + 1 }}
+                  sx={{ position: 'absolute', ...tile.pos, width: tile.w, zIndex: tile.z }}
                 >
                   <Box
                     component={motion.div}

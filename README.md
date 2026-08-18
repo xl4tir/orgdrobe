@@ -1,32 +1,73 @@
-# OrgDrobe 👕
+<div align="center">
 
-Your digital wardrobe — catalogue your clothes, craft outfits, and rediscover what you own.
-Built as a modern, scalable React front-end from the *orgdrobe* Figma prototype.
+# 👗 OrgDrobe
 
-<p>
-  <img alt="React" src="https://img.shields.io/badge/React-18-149ECA" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6" />
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-6-646CFF" />
-  <img alt="MUI" src="https://img.shields.io/badge/MUI-6-007FFF" />
-</p>
+### Your whole wardrobe, finally organized.
 
-## Tech stack
+Catalogue every garment, craft outfits you’ll actually wear, and rediscover the pieces hiding in the back of the closet.
 
-| Concern            | Choice                                   |
-| ------------------ | ---------------------------------------- |
-| Framework          | React 18 + TypeScript                    |
-| Build tool         | Vite 6                                    |
-| UI system          | Material UI (MUI) v6 + Emotion           |
-| Animation          | Framer Motion                            |
-| Routing            | React Router v6                          |
-| State              | Zustand (with `persist` for auth)        |
-| Fonts              | Fraunces + Manrope (bundled, offline)    |
+<br/>
 
-## Getting started
+[![React](https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![MUI](https://img.shields.io/badge/MUI-6-007FFF?logo=mui&logoColor=white)](https://mui.com)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-11-0055FF?logo=framer&logoColor=white)](https://www.framer.com/motion/)
+![License](https://img.shields.io/badge/license-MIT-1B1712)
+
+</div>
+
+---
+
+## ✨ What is OrgDrobe?
+
+OrgDrobe is a **digital wardrobe** web app. Photograph and tag what you own, then let the
+app help you actually wear it — build outfits on a drag‑and‑drop canvas, get suggestions
+that match today’s weather, and see honest stats about the colours you reach for and the
+pieces gathering dust.
+
+> **Try it in seconds:** the login screen ships with a demo account pre‑filled — just press **Log in**.
+
+---
+
+## 🎯 Features
+
+| | |
+|---|---|
+| 🧺 **Wardrobe** | A searchable, filterable grid of every garment. Filter by category, colour, season, or how often you actually wear it. Real photos, with an elegant colour‑silhouette fallback. |
+| ➕ **Add garment** | A polished dialog with **real photo upload** (file picker *or* drag & drop), category, colours, seasons, brand & material — with a live preview. |
+| 🪄 **Outfit builder** | Compose outfits by **dragging** pieces between your wardrobe and the outfit, reorder them, and switch between *Cover · Grid · Canvas* layouts. |
+| 📊 **Dashboard** | A weather widget, quick stats, weather‑aware suggestions, and a “your palette” breakdown of your most‑worn colours. |
+| 🕓 **Feed** | A timeline of everything you’ve worn and added — toggle between verbose and concise. |
+| 🗓️ **Calendar** | A month view of what you wore, day by day. |
+| ⚙️ **Settings** | Profile, security, and a light/dark **appearance** toggle. |
+| 🌗 **Theming** | A hand‑built design system with light & dark modes, editorial typography, and tasteful motion throughout. Fully responsive from phones to wide desktops. |
+
+---
+
+## 🛠️ Tech stack
+
+| Concern | Choice |
+|---|---|
+| Framework | **React 18** + **TypeScript** |
+| Build tool | **Vite 6** |
+| UI system | **Material UI (MUI) v6** + Emotion |
+| Animation | **Framer Motion** |
+| Drag & drop | **@dnd‑kit** |
+| Routing | **React Router v6** |
+| State | **Zustand** (with `persist` for auth) |
+| Fonts | **Fraunces** + **Manrope** (bundled, offline) |
+
+---
+
+## 🚀 Getting started
 
 ```bash
+# 1. install
 npm install
-npm run dev      # http://localhost:5173
+
+# 2. run the dev server → http://localhost:5173
+npm run dev
 ```
 
 Other scripts:
@@ -37,56 +78,66 @@ npm run preview    # preview the production build
 npm run typecheck  # types only, no emit
 ```
 
-> A **demo account is pre-filled** on the login screen — just press *Log in*.
+---
 
-## Project structure
+## 🗂️ Project structure
 
-The codebase is **feature-first**: each domain owns its pages, components,
-store and data. Shared building blocks live in `components/` and `lib/`.
+The codebase is **feature‑first**: each domain owns its pages, components, store and data.
+Shared building blocks live in `components/` and `lib/`, and the whole look is driven by a
+single set of design tokens.
 
 ```
 src/
 ├── app/                  # composition: router, providers, navigation config
-│   ├── providers/        # AppProviders (theme + router)
-│   ├── navigation.tsx    # single source of truth for nav items
-│   └── router.tsx        # route table
-├── theme/                # design system
-│   ├── tokens.ts         # colours, radii, gradients, shadows, motion easings
+├── theme/                # design system — tokens, palette, typography, motion
+│   ├── tokens.ts         # colours, radii, gradients, shadows, easings
 │   ├── palette.ts        # light + dark palettes
-│   ├── typography.ts     # type scale (serif display + sans body)
-│   ├── components.ts     # global MUI component overrides
-│   ├── motion.ts         # reusable Framer Motion variants
-│   └── ColorModeContext  # light/dark provider (persisted)
+│   ├── typography.ts     # serif display + sans body scale
+│   └── components.ts     # global MUI overrides
 ├── components/
 │   ├── layout/           # AppShell, Header, SidebarNav, BottomNav, guards
-│   └── ui/               # GarmentVisual, OutfitVisual, cards, StatTile, …
+│   └── ui/               # GarmentVisual, OutfitVisual, EmojiTile, cards, …
 ├── features/
 │   ├── landing/          # marketing landing page
 │   ├── auth/             # login / register + auth store
 │   ├── dashboard/        # weather, stats, suggestions, palette
-│   ├── garments/         # wardrobe grid, filters, detail, store
-│   ├── outfits/          # outfit grid, editor (canvas/grid/cover), store
+│   ├── garments/         # wardrobe grid, filters, detail, add-dialog, store
+│   ├── outfits/          # outfit grid + drag-and-drop editor, store
 │   ├── feed/             # activity timeline
-│   ├── calendar/         # month view of what was worn
+│   ├── calendar/         # month view
 │   └── settings/         # profile, security, appearance
-├── lib/                  # colours catalogue, mock data, formatters, helpers
+├── lib/                  # colour catalogue, mock data, formatters, helpers
 ├── types/                # domain models (Garment, Outfit, …)
 └── styles/               # global.css
 ```
 
-## Design language
+---
 
-- **Editorial pairing** — Fraunces (display serif) for headlines, Manrope for UI.
-- **Signature palette** — iris violet → coral gradient over warm, clay-tinted neutrals.
-- **No image dependencies** — garments render as *fabric gradients* derived from
-  each item's own colours, so nothing ever loads broken and the look stays on-brand.
-- **Motion everywhere, tastefully** — page transitions, staggered card reveals,
-  hover lift, animated theme toggle. Respects `prefers-reduced-motion`.
+## 🎨 Design language
+
+- **Editorial pairing** — *Fraunces* (display serif) for headlines, *Manrope* for UI.
+- **Signature palette** — an iris‑violet → coral gradient over warm, clay‑tinted neutrals.
+- **Never‑broken imagery** — garments show real photos; if one fails to load, the UI falls
+  back to a colour silhouette derived from the garment’s own colours. Decorative hero and
+  auth flourishes use playful emoji tiles.
+- **Motion, tastefully** — page transitions, staggered card reveals, hover lift, an animated
+  theme toggle — all respecting `prefers-reduced-motion`.
 - **Light & dark**, responsive from 360 px phones to wide desktops.
 
-## Notes
+---
 
-- All data is currently **mock data** (`src/lib/mockData.ts`) held in Zustand
-  stores. Swapping in a real API means replacing the store action bodies — the
-  component contracts stay the same.
-- Auth is mocked and persisted to `localStorage`.
+## 🧭 Notes & roadmap
+
+- Data is currently **mock data** held in Zustand stores — swapping in a real API means
+  replacing store action bodies; component contracts stay the same.
+- Uploaded photos are kept in memory as data URLs (session‑scoped for now).
+- **Next up:** persistent storage (IndexedDB / backend), real weather API, colour extraction
+  from uploaded photos, and shareable outfit links.
+
+---
+
+<div align="center">
+
+Made with care for people who love their clothes. · **MIT License**
+
+</div>
