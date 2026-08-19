@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Dialog,
   IconButton,
   Stack,
@@ -22,6 +23,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { GarmentVisual } from '@/components/ui/GarmentVisual'
 import { getColor } from '@/lib/colors'
 import { detectDominantColors, normalizeHex, eyedropperSupported } from '@/lib/imageColor'
+import { removeBackground } from '@/lib/removeBackground'
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -62,6 +64,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
   const [image, setImage] = useState<string | undefined>(undefined)
   const [dragOver, setDragOver] = useState(false)
   const [autoDetected, setAutoDetected] = useState(false)
+  const [processing, setProcessing] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -78,6 +81,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
       setImage(undefined)
       setDragOver(false)
       setAutoDetected(false)
+      setProcessing(false)
     }
   }, [open])
 
@@ -88,12 +92,17 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
       if (typeof reader.result !== 'string') return
       const url = reader.result
       setImage(url)
-      // Auto-detect the garment's colours straight from the photo (real hex values).
-      detectDominantColors(url, 3).then((hexes) => {
-        if (hexes.length) {
-          setColors(hexes)
-          setAutoDetected(true)
-        }
+      setProcessing(true)
+      // Strip the background to a transparent cutout, then detect colours from it.
+      removeBackground(url).then((clean) => {
+        setImage(clean)
+        setProcessing(false)
+        detectDominantColors(clean, 3).then((hexes) => {
+          if (hexes.length) {
+            setColors(hexes)
+            setAutoDetected(true)
+          }
+        })
       })
     }
     reader.readAsDataURL(file)
@@ -237,6 +246,29 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
                 <GarmentVisual garment={previewGarment} ratio="3 / 4" radius={18} />
               </Box>
             </AnimatePresence>
+
+            {processing && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 6,
+                  borderRadius: '18px',
+                  display: 'grid',
+                  placeItems: 'center',
+                  bgcolor: (t) =>
+                    t.palette.mode === 'light' ? 'rgba(255,255,255,0.62)' : 'rgba(20,17,25,0.6)',
+                  backdropFilter: 'blur(2px)',
+                  zIndex: 2,
+                }}
+              >
+                <Stack alignItems="center" spacing={1}>
+                  <CircularProgress size={26} />
+                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                    Removing background…
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
 
             {/* hover / drag hint (only while there is no photo) */}
             {!hasImage && (

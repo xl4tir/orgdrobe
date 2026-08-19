@@ -38,6 +38,9 @@ export function GarmentVisual({
   const [imgOk, setImgOk] = useState(Boolean(garment.image))
   useEffect(() => setImgOk(Boolean(garment.image)), [garment.image])
   const showPhoto = Boolean(garment.image) && imgOk
+  // Uploaded, background-removed cutouts are transparent PNGs (data URLs) — show
+  // the whole garment with breathing room; remote demo photos fill the frame.
+  const isCutout = garment.image?.startsWith('data:') ?? false
 
   // A gentle wash of the garment's own colour — pale in light mode, deep in dark.
   const bg = isLight
@@ -86,10 +89,11 @@ export function GarmentVisual({
           onError={() => setImgOk(false)}
           sx={{
             position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            inset: isCutout ? '8%' : 0,
+            width: isCutout ? '84%' : '100%',
+            height: isCutout ? '84%' : '100%',
+            objectFit: isCutout ? 'contain' : 'cover',
+            filter: isCutout ? 'drop-shadow(0 8px 16px rgba(20,17,14,0.16))' : 'none',
             display: showPhoto ? 'block' : 'none',
           }}
         />
