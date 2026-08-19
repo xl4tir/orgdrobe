@@ -1,6 +1,7 @@
 {
   // Static-assets deployment for Cloudflare Workers (used by `npx wrangler deploy`).
-  "name": "orgdrobe",
+  // Separate worker so the editorial design lives at its own workers.dev URL.
+  "name": "orgdrobe-editorial",
   "compatibility_date": "2024-11-01",
   // Enable the free orgdrobe.<subdomain>.workers.dev URL.
   "workers_dev": true,
