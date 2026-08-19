@@ -2,7 +2,11 @@ import { createTheme, responsiveFontSizes, type PaletteMode, type Theme } from '
 import { getPalette } from './palette'
 import { typography } from './typography'
 import { getComponents } from './components'
+import { getEditorialPalette, editorialTypography, getEditorialComponents } from './editorialTheme'
 import { gradients, radii, softShadows } from './tokens'
+
+/** The two design languages the app can render in. */
+export type Design = 'material' | 'editorial'
 
 /**
  * Extra design tokens surfaced on the theme object so components can read brand
@@ -25,13 +29,14 @@ declare module '@mui/material/styles' {
   }
 }
 
-export const createAppTheme = (mode: PaletteMode): Theme => {
+export const createAppTheme = (mode: PaletteMode, design: Design = 'material'): Theme => {
+  const editorial = design === 'editorial'
   const theme = createTheme({
-    palette: getPalette(mode),
-    typography,
-    shape: { borderRadius: 4 },
+    palette: editorial ? getEditorialPalette(mode) : getPalette(mode),
+    typography: editorial ? editorialTypography : typography,
+    shape: { borderRadius: editorial ? radii.md : 4 },
     spacing: 8,
-    components: getComponents(),
+    components: editorial ? getEditorialComponents() : getComponents(),
     custom: { gradients, radii, softShadows },
   })
   return responsiveFontSizes(theme, { factor: 2.2 })
