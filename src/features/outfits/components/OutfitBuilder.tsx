@@ -6,7 +6,8 @@ import DragIndicatorRoundedIcon from '@mui/icons-material/DragIndicatorRounded'
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   KeyboardSensor,
   closestCorners,
   useSensor,
@@ -71,7 +72,9 @@ function SortableGarment({
         sx={{
           position: 'relative',
           cursor: zone === 'wardrobe' ? 'pointer' : 'grab',
-          touchAction: 'none',
+          // pan-y keeps vertical page scrolling working on touch; the delay
+          // TouchSensor still lets a press-and-hold start a drag.
+          touchAction: 'pan-y',
           opacity: isDragging ? 0.35 : 1,
           outline: 'none',
           '&:active': { cursor: 'grabbing' },
@@ -238,7 +241,10 @@ export function OutfitBuilder({ pieceIds, setPieceIds, allGarments }: OutfitBuil
   const wardrobeIds = wardrobePieces.map((g) => g.id)
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    // Mouse: start dragging after a small move. Touch: require a short hold so a
+    // quick swipe scrolls the page instead of grabbing a tile.
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 220, tolerance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 

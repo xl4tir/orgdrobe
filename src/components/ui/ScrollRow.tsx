@@ -106,7 +106,8 @@ export function ScrollRow({ children, itemWidth = 210 }: ScrollRowProps) {
         px: { xs: 2, sm: 0 },
         '& > *': { scrollSnapAlign: 'start' },
         scrollbarWidth: 'thin',
-        touchAction: 'pan-x',
+        // Let the browser decide: horizontal swipe scrolls the row, vertical
+        // swipe scrolls the page (touch-action: pan-x would block the latter).
         overscrollBehaviorX: 'contain',
       }}
     >
