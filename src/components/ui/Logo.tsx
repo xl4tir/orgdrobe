@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, useTheme } from '@mui/material'
 
 interface LogoProps {
   size?: number
@@ -8,6 +8,8 @@ interface LogoProps {
 
 /** The OrgDrobe mark + wordmark. The "O" hanger echoes the favicon. */
 export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoProps) {
+  const theme = useTheme()
+  const editorial = theme.custom.design === 'editorial'
   return (
     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.1 }}>
       <Box
@@ -15,7 +17,12 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
           width: size,
           height: size,
           borderRadius: `${size * 0.32}px`,
-          bgcolor: 'primary.main',
+          ...(editorial
+            ? {
+                background: theme.custom.gradients.brand,
+                boxShadow: '0 6px 16px rgba(102,80,230,0.35)',
+              }
+            : { bgcolor: 'primary.main' }),
           display: 'grid',
           placeItems: 'center',
           flexShrink: 0,
@@ -33,6 +40,7 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
         <Typography
           component="span"
           sx={{
+            ...(editorial && { fontFamily: '"Fraunces Variable", serif' }),
             fontWeight: 600,
             fontSize: size * 0.62,
             letterSpacing: '-0.02em',
@@ -41,7 +49,10 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
           }}
         >
           Роздя
-          <Box component="span" sx={{ color: onDark ? '#fff' : 'primary.main' }}>
+          <Box
+            component="span"
+            sx={{ color: onDark ? (editorial ? 'secondary.light' : '#fff') : 'primary.main' }}
+          >
             гальня
           </Box>
         </Typography>

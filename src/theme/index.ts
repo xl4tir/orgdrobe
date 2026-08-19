@@ -18,6 +18,7 @@ declare module '@mui/material/styles' {
       gradients: typeof gradients
       radii: typeof radii
       softShadows: typeof softShadows
+      design: Design
     }
   }
   interface ThemeOptions {
@@ -25,6 +26,7 @@ declare module '@mui/material/styles' {
       gradients?: typeof gradients
       radii?: typeof radii
       softShadows?: typeof softShadows
+      design?: Design
     }
   }
 }
@@ -37,7 +39,7 @@ export const createAppTheme = (mode: PaletteMode, design: Design = 'material'): 
     shape: { borderRadius: editorial ? radii.md : 4 },
     spacing: 8,
     components: editorial ? getEditorialComponents() : getComponents(),
-    custom: { gradients, radii, softShadows },
+    custom: { gradients, radii, softShadows, design },
   })
   return responsiveFontSizes(theme, { factor: 2.2 })
 }

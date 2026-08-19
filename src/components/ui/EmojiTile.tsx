@@ -31,6 +31,7 @@ export function EmojiTile({
 }: EmojiTileProps) {
   const theme = useTheme()
   const isLight = theme.palette.mode === 'light'
+  const editorial = theme.custom.design === 'editorial'
   // Tint from the more saturated of the two colours, so light pieces (white/ivory)
   // still get a visible card instead of washing out.
   const a = getColor(colors[0])
@@ -38,7 +39,12 @@ export function EmojiTile({
   const base = (a.group === 'white' || a.group === 'gray') && b.group !== 'white' ? b.hex : a.hex
 
   // Flat Material tonal container — a clear pastel of the dominant colour.
-  const bg = isLight ? lighten(base, 0.42) : mix(base, '#211F26', 0.5)
+  const materialBg = isLight ? lighten(base, 0.42) : mix(base, '#211F26', 0.5)
+  // Editorial pastel gradient wash of the dominant colour.
+  const primary = a.hex
+  const editorialBg = isLight
+    ? `linear-gradient(160deg, ${lighten(primary, 0.72)} 0%, ${lighten(primary, 0.46)} 100%)`
+    : `linear-gradient(160deg, ${mix(primary, '#17151C', 0.55)} 0%, ${mix(primary, '#17151C', 0.8)} 100%)`
 
   return (
     <Box
@@ -49,13 +55,31 @@ export function EmojiTile({
         aspectRatio: ratio,
         borderRadius: `${radius}px`,
         overflow: 'hidden',
-        bgcolor: bg,
+        ...(editorial
+          ? {
+              background: editorialBg,
+              boxShadow: isLight
+                ? 'inset 0 0 0 1px rgba(0,0,0,0.05)'
+                : 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+            }
+          : { bgcolor: materialBg, boxShadow: theme.shadows[2] }),
         display: 'grid',
         placeItems: 'center',
-        boxShadow: theme.shadows[2],
         ...sx,
       }}
     >
+      {editorial && (
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: `radial-gradient(120% 80% at 26% 12%, ${
+              isLight ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.08)'
+            } 0%, transparent 60%)`,
+          }}
+        />
+      )}
       <Box
         component="span"
         sx={{

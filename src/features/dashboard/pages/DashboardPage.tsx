@@ -149,18 +149,34 @@ function FastNavCard({
   onClick: () => void
 }) {
   return (
-    <Card component={motion.div} whileHover={{ y: -4 }} sx={{ height: '100%' }}>
+    <Card
+      component={motion.div}
+      whileHover={{ y: -4 }}
+      sx={{
+        height: '100%',
+        boxShadow: (t) => (t.custom.design === 'editorial' ? t.custom.softShadows.md : undefined),
+      }}
+    >
       <CardActionArea
         onClick={onClick}
-        sx={{
+        sx={(t) => ({
           p: 3,
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           gap: 2,
-          bgcolor: accent ? 'secondary.main' : 'primary.main',
-          color: accent ? 'secondary.contrastText' : 'primary.contrastText',
-        }}
+          ...(t.custom.design === 'editorial'
+            ? {
+                color: '#fff',
+                background: accent
+                  ? t.custom.gradients.brand
+                  : 'linear-gradient(135deg, #2A2740 0%, #1C1A2B 100%)',
+              }
+            : {
+                bgcolor: accent ? 'secondary.main' : 'primary.main',
+                color: accent ? 'secondary.contrastText' : 'primary.contrastText',
+              }),
+        })}
       >
         <Box
           sx={{

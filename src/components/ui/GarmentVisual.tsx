@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Box, useTheme, type SxProps, type Theme } from '@mui/material'
 import type { Garment } from '@/types/domain'
 import { getColor } from '@/lib/colors'
-import { mix, readableOn } from '@/lib/colorUtils'
+import { lighten, mix, readableOn } from '@/lib/colorUtils'
 import { GarmentIcon } from './GarmentIcon'
 
 interface GarmentVisualProps {
@@ -32,6 +32,7 @@ export function GarmentVisual({
 }: GarmentVisualProps) {
   const theme = useTheme()
   const isLight = theme.palette.mode === 'light'
+  const editorial = theme.custom.design === 'editorial'
   const primary = getColor(garment.colors[0]).hex
   const secondary = garment.colors[1] ? getColor(garment.colors[1]).hex : undefined
 
@@ -42,8 +43,12 @@ export function GarmentVisual({
   // the whole garment with breathing room; remote demo photos fill the frame.
   const isCutout = garment.image?.startsWith('data:') ?? false
 
-  // A flat, solid wash of the garment's own colour — pale in light mode, deep in dark.
-  const bg = isLight ? mix(primary, '#ffffff', 0.82) : mix(primary, '#211F26', 0.7)
+  // Material: a flat, solid wash of the garment's own colour — pale in light mode, deep in dark.
+  const materialBg = isLight ? mix(primary, '#ffffff', 0.82) : mix(primary, '#211F26', 0.7)
+  // Editorial: a gentle colour-wash gradient of the garment's own colour.
+  const editorialBg = isLight
+    ? `linear-gradient(160deg, ${lighten(primary, 0.84)} 0%, ${lighten(primary, 0.6)} 100%)`
+    : `linear-gradient(160deg, ${mix(primary, '#17151C', 0.7)} 0%, ${mix(primary, '#17151C', 0.88)} 100%)`
 
   const swatchRing = isLight ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.35)'
 
@@ -56,13 +61,27 @@ export function GarmentVisual({
         aspectRatio: ratio,
         borderRadius: `${radius}px`,
         overflow: 'hidden',
-        bgcolor: bg,
+        ...(editorial ? { background: editorialBg } : { bgcolor: materialBg }),
         display: 'grid',
         placeItems: 'center',
         boxShadow: isLight ? 'inset 0 0 0 1px rgba(0,0,0,0.04)' : 'inset 0 0 0 1px rgba(255,255,255,0.05)',
         ...sx,
       }}
     >
+      {/* soft radial highlight for depth (editorial only, visible behind the silhouette) */}
+      {editorial && !showPhoto && (
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: `radial-gradient(120% 80% at 26% 12%, ${
+              isLight ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.08)'
+            } 0%, transparent 60%)`,
+          }}
+        />
+      )}
+
       {/* real photo */}
       {garment.image && (
         <Box

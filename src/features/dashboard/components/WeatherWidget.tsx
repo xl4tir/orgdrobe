@@ -7,13 +7,16 @@ import { motion } from 'framer-motion'
 import type { Weather, WeatherCondition } from '@/types/domain'
 import { riseItem } from '@/theme/motion'
 
-const CONDITION: Record<WeatherCondition, { emoji: string; label: string; color: string }> = {
-  sunny: { emoji: '☀️', label: 'Sunny', color: '#EF7A3D' },
-  cloudy: { emoji: '⛅', label: 'Cloudy', color: '#5C7CB3' },
-  rain: { emoji: '🌧️', label: 'Rainy', color: '#3E5C82' },
-  snow: { emoji: '❄️', label: 'Snowy', color: '#6E8BB5' },
-  fog: { emoji: '🌫️', label: 'Foggy', color: '#71718A' },
-  storm: { emoji: '⛈️', label: 'Storm', color: '#2C2E43' },
+const CONDITION: Record<
+  WeatherCondition,
+  { emoji: string; label: string; color: string; from: string; to: string }
+> = {
+  sunny: { emoji: '☀️', label: 'Sunny', color: '#EF7A3D', from: '#FDB44B', to: '#FF7E5F' },
+  cloudy: { emoji: '⛅', label: 'Cloudy', color: '#5C7CB3', from: '#8EC5FC', to: '#7C93C3' },
+  rain: { emoji: '🌧️', label: 'Rainy', color: '#3E5C82', from: '#5B7CB3', to: '#3E5C82' },
+  snow: { emoji: '❄️', label: 'Snowy', color: '#6E8BB5', from: '#A7C7E7', to: '#C9D6DF' },
+  fog: { emoji: '🌫️', label: 'Foggy', color: '#71718A', from: '#B0AFC0', to: '#8A8AA0' },
+  storm: { emoji: '⛈️', label: 'Storm', color: '#2C2E43', from: '#4B4E6D', to: '#2C2E43' },
 }
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
@@ -43,7 +46,10 @@ export function WeatherWidget({ weather }: { weather: Weather }) {
         overflow: 'hidden',
         color: '#fff',
         border: 'none',
-        bgcolor: c.color,
+        background: (t) =>
+          t.custom.design === 'editorial'
+            ? `linear-gradient(135deg, ${c.from} 0%, ${c.to} 100%)`
+            : c.color,
         p: 3,
         minHeight: 200,
       }}
@@ -69,7 +75,15 @@ export function WeatherWidget({ weather }: { weather: Weather }) {
             {weather.city} · Today
           </Typography>
           <Stack direction="row" alignItems="baseline" spacing={1}>
-            <Typography sx={{ fontSize: '3.4rem', lineHeight: 1, fontWeight: 600 }}>
+            <Typography
+              sx={{
+                fontFamily: (t) =>
+                  t.custom.design === 'editorial' ? '"Fraunces Variable", serif' : undefined,
+                fontSize: '3.4rem',
+                lineHeight: 1,
+                fontWeight: 600,
+              }}
+            >
               {weather.tempC}°
             </Typography>
             <Typography variant="h6" sx={{ opacity: 0.95 }}>

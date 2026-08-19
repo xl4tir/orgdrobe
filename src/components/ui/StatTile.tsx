@@ -39,7 +39,14 @@ export function StatTile({ label, value, hint, icon, accent = 'primary.main' }: 
           </Box>
         )}
       </Stack>
-      <Typography variant="h4" sx={{ mt: 1 }}>
+      <Typography
+        variant="h4"
+        sx={{
+          mt: 1,
+          fontFamily: (t) =>
+            t.custom.design === 'editorial' ? '"Fraunces Variable", serif' : undefined,
+        }}
+      >
         {value}
       </Typography>
       {hint && (

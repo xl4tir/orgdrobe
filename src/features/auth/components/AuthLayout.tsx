@@ -26,7 +26,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           position: 'relative',
           width: '46%',
           overflow: 'hidden',
-          bgcolor: PANEL_BG,
+          background: (t) => (t.custom.design === 'editorial' ? t.custom.gradients.irisGlow : PANEL_BG),
         }}
       >
         {FLOATERS.map((f, i) => (
