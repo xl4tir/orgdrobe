@@ -59,12 +59,13 @@ export function LandingPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
   // Casually tossed, tilted cards with only light corner overlap — a playful scatter.
+  // `et` tilts just the emoji so a few icons sit askew.
   const heroTiles = [
-    { category: 'tops' as const, colors: ['sky', 'denim'], pos: { top: '2%', left: '3%' }, w: '37%', r: -12, z: 2, d: 0 },
-    { category: 'dresses' as const, colors: ['burgundy', 'plum'], pos: { top: '0%', right: '4%' }, w: '37%', r: 10, z: 3, d: 0.08 },
-    { category: 'outerwear' as const, colors: ['camel', 'sand'], pos: { top: '34%', left: '31%' }, w: '38%', r: -4, z: 5, d: 0.16 },
-    { category: 'footwear' as const, colors: ['white', 'stone'], pos: { bottom: '1%', left: '2%' }, w: '36%', r: 13, z: 4, d: 0.24 },
-    { category: 'accessories' as const, colors: ['forest', 'sage'], pos: { bottom: '0%', right: '3%' }, w: '37%', r: -11, z: 1, d: 0.32 },
+    { category: 'tops' as const, colors: ['sky', 'denim'], pos: { top: '2%', left: '3%' }, w: '37%', r: -12, z: 2, d: 0, et: -14 },
+    { category: 'dresses' as const, colors: ['burgundy', 'plum'], pos: { top: '0%', right: '4%' }, w: '37%', r: 10, z: 3, d: 0.08, et: 0 },
+    { category: 'outerwear' as const, colors: ['camel', 'sand'], pos: { top: '34%', left: '31%' }, w: '38%', r: -4, z: 5, d: 0.16, et: 12 },
+    { category: 'footwear' as const, colors: ['white', 'stone'], pos: { bottom: '1%', left: '2%' }, w: '36%', r: 13, z: 4, d: 0.24, et: 0 },
+    { category: 'accessories' as const, colors: ['forest', 'sage'], pos: { bottom: '0%', right: '3%' }, w: '37%', r: -11, z: 1, d: 0.32, et: -10 },
   ]
 
   return (
@@ -164,7 +165,7 @@ export function LandingPage() {
                       filter: 'drop-shadow(0 24px 48px rgba(27,23,18,0.18))',
                     }}
                   >
-                    <EmojiTile category={tile.category} colors={tile.colors} ratio="3 / 4" radius={22} />
+                    <EmojiTile category={tile.category} colors={tile.colors} emojiTilt={tile.et} ratio="3 / 4" radius={22} />
                   </Box>
                 </Box>
               ))}

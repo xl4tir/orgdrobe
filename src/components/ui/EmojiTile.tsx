@@ -11,6 +11,8 @@ interface EmojiTileProps {
   ratio?: string
   radius?: number
   emojiSize?: string
+  /** Rotate just the emoji (degrees) for a playful, askew look. */
+  emojiTilt?: number
   sx?: SxProps<Theme>
 }
 
@@ -24,6 +26,7 @@ export function EmojiTile({
   ratio = '3 / 4',
   radius = 20,
   emojiSize = 'clamp(2.4rem, 6vw, 3.6rem)',
+  emojiTilt = 0,
   sx,
 }: EmojiTileProps) {
   const theme = useTheme()
@@ -65,6 +68,7 @@ export function EmojiTile({
         sx={{
           fontSize: emojiSize,
           lineHeight: 1,
+          transform: emojiTilt ? `rotate(${emojiTilt}deg)` : 'none',
           filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.22))',
           userSelect: 'none',
         }}
