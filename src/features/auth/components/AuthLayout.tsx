@@ -5,12 +5,15 @@ import { Logo } from '@/components/ui/Logo'
 import { EmojiTile } from '@/components/ui/EmojiTile'
 import { MOCK_GARMENTS } from '@/lib/mockData'
 
+// Kept to the upper area so they never collide with the heading below.
 const FLOATERS = [
-  { g: MOCK_GARMENTS[0], top: '14%', left: '12%', rotate: -10, delay: 0 },
-  { g: MOCK_GARMENTS[6], top: '30%', left: '52%', rotate: 8, delay: 0.15 },
-  { g: MOCK_GARMENTS[8], top: '54%', left: '20%', rotate: -6, delay: 0.3 },
-  { g: MOCK_GARMENTS[10], top: '62%', left: '58%', rotate: 12, delay: 0.45 },
+  { g: MOCK_GARMENTS[0], top: '7%', left: '9%', rotate: -8, delay: 0 },
+  { g: MOCK_GARMENTS[6], top: '12%', left: '52%', rotate: 9, delay: 0.15 },
+  { g: MOCK_GARMENTS[8], top: '38%', left: '28%', rotate: -5, delay: 0.3 },
 ]
+
+/** Fixed brand blue (both themes) so white text always contrasts. */
+const PANEL_BG = '#1565c0'
 
 /** Split-screen auth frame: a branded, animated panel beside the form. */
 export function AuthLayout({ children, title, subtitle }: { children: ReactNode; title: string; subtitle: string }) {
@@ -23,7 +26,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           position: 'relative',
           width: '46%',
           overflow: 'hidden',
-          bgcolor: 'primary.main',
+          bgcolor: PANEL_BG,
         }}
       >
         {FLOATERS.map((f, i) => (
@@ -33,18 +36,35 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             initial={{ opacity: 0, y: 30, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.2 + f.delay, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            sx={{ position: 'absolute', top: f.top, left: f.left, width: '30%', zIndex: 1 }}
+            sx={{ position: 'absolute', top: f.top, left: f.left, width: '26%', zIndex: 1 }}
           >
             <Box
               component={motion.div}
               animate={{ y: [0, -14, 0] }}
               transition={{ duration: 6 + i, repeat: Infinity, ease: 'easeInOut' }}
-              sx={{ transform: `rotate(${f.rotate}deg)`, filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.28))' }}
+              sx={{ transform: `rotate(${f.rotate}deg)`, filter: 'drop-shadow(0 16px 30px rgba(0,0,0,0.25))' }}
             >
-              <EmojiTile category={f.g.category} colors={f.g.colors} ratio="3 / 4" radius={18} />
+              <EmojiTile
+                category={f.g.category}
+                colors={f.g.colors}
+                ratio="3 / 4"
+                radius={18}
+                sx={{ bgcolor: 'rgba(255,255,255,0.18)' }}
+              />
             </Box>
           </Box>
         ))}
+
+        {/* readability scrim behind the heading */}
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 1,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 45%)',
+          }}
+        />
 
         <Box
           sx={{

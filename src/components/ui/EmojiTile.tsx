@@ -1,6 +1,7 @@
-import { alpha, Box, useTheme, type SxProps, type Theme } from '@mui/material'
+import { Box, useTheme, type SxProps, type Theme } from '@mui/material'
 import type { GarmentCategory } from '@/types/domain'
 import { getColor } from '@/lib/colors'
+import { lighten, mix } from '@/lib/colorUtils'
 import { CATEGORY_EMOJI } from '@/lib/categoryVisual'
 
 interface EmojiTileProps {
@@ -30,10 +31,14 @@ export function EmojiTile({
 }: EmojiTileProps) {
   const theme = useTheme()
   const isLight = theme.palette.mode === 'light'
-  const primary = getColor(colors[0]).hex
+  // Tint from the more saturated of the two colours, so light pieces (white/ivory)
+  // still get a visible card instead of washing out.
+  const a = getColor(colors[0])
+  const b = colors[1] ? getColor(colors[1]) : a
+  const base = (a.group === 'white' || a.group === 'gray') && b.group !== 'white' ? b.hex : a.hex
 
-  // Flat Material tonal container — a solid tint of the dominant colour.
-  const bg = alpha(primary, isLight ? 0.14 : 0.24)
+  // Flat Material tonal container — a clear pastel of the dominant colour.
+  const bg = isLight ? lighten(base, 0.42) : mix(base, '#211F26', 0.5)
 
   return (
     <Box
@@ -47,7 +52,7 @@ export function EmojiTile({
         bgcolor: bg,
         display: 'grid',
         placeItems: 'center',
-        boxShadow: theme.shadows[1],
+        boxShadow: theme.shadows[2],
         ...sx,
       }}
     >

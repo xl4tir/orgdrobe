@@ -41,7 +41,7 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
           }}
         >
           Роздя
-          <Box component="span" sx={{ color: onDark ? 'secondary.light' : 'primary.main' }}>
+          <Box component="span" sx={{ color: onDark ? '#fff' : 'primary.main' }}>
             гальня
           </Box>
         </Typography>

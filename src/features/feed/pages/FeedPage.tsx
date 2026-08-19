@@ -16,10 +16,10 @@ import { formatEventTime } from '@/lib/format'
 import { staggerContainer, riseItem } from '@/theme/motion'
 
 const EVENT_META: Record<FeedEventType, { verb: string; kind: 'garment' | 'outfit'; color: string }> = {
-  outfit_worn: { verb: 'Wore the outfit', kind: 'outfit', color: '#6650E6' },
-  outfit_created: { verb: 'Created the outfit', kind: 'outfit', color: '#2FA37A' },
-  garment_created: { verb: 'Added the garment', kind: 'garment', color: '#F0A83C' },
-  garment_worn: { verb: 'Wore', kind: 'garment', color: '#FF6B57' },
+  outfit_worn: { verb: 'Wore the outfit', kind: 'outfit', color: '#1976d2' },
+  outfit_created: { verb: 'Created the outfit', kind: 'outfit', color: '#2e7d32' },
+  garment_created: { verb: 'Added the garment', kind: 'garment', color: '#ed6c02' },
+  garment_worn: { verb: 'Wore', kind: 'garment', color: '#0288d1' },
 }
 
 export function FeedPage() {
