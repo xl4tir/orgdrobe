@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box,
@@ -22,6 +22,7 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import ViewModuleRoundedIcon from '@mui/icons-material/ViewModuleRounded'
 import ImageRoundedIcon from '@mui/icons-material/ImageRounded'
 import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded'
+import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
 import { motion } from 'framer-motion'
 import type { Garment, OutfitLayout } from '@/types/domain'
 import { PageContainer } from '@/components/ui/PageContainer'
@@ -53,7 +54,19 @@ export function OutfitEditorPage() {
   const [pieceIds, setPieceIds] = useState<string[]>(outfit?.garmentIds ?? [])
   const [name, setName] = useState(outfit?.name ?? '')
   const [description, setDescription] = useState(outfit?.description ?? '')
+  const [coverImage, setCoverImage] = useState<string | undefined>(outfit?.coverImage)
+  const [coverDrag, setCoverDrag] = useState(false)
   const [snack, setSnack] = useState<string | null>(null)
+  const coverInputRef = useRef<HTMLInputElement | null>(null)
+
+  const readCover = (file: File | null | undefined) => {
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') setCoverImage(reader.result)
+    }
+    reader.readAsDataURL(file)
+  }
 
   const pieces = useMemo(
     () =>
@@ -91,7 +104,7 @@ export function OutfitEditorPage() {
   }
 
   const handleSave = () => {
-    updateOutfit(outfit.id, { name, description, garmentIds: pieceIds, layout })
+    updateOutfit(outfit.id, { name, description, garmentIds: pieceIds, layout, coverImage })
     setSnack('Outfit saved')
   }
 
@@ -120,16 +133,83 @@ export function OutfitEditorPage() {
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.35 }}
+              onClick={layout === 'cover' ? () => coverInputRef.current?.click() : undefined}
+              onDragOver={
+                layout === 'cover'
+                  ? (e) => {
+                      e.preventDefault()
+                      setCoverDrag(true)
+                    }
+                  : undefined
+              }
+              onDragLeave={() => setCoverDrag(false)}
+              onDrop={
+                layout === 'cover'
+                  ? (e) => {
+                      e.preventDefault()
+                      setCoverDrag(false)
+                      readCover(e.dataTransfer.files?.[0])
+                    }
+                  : undefined
+              }
+              sx={{ position: 'relative', cursor: layout === 'cover' ? 'pointer' : 'default' }}
             >
-              <OutfitVisual garments={pieces} layout={layout} ratio="1 / 1" />
+              <OutfitVisual garments={pieces} layout={layout} coverImage={coverImage} ratio="1 / 1" />
+
+              {layout === 'cover' && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '18px',
+                    display: 'grid',
+                    placeItems: 'center',
+                    textAlign: 'center',
+                    p: 2,
+                    color: '#fff',
+                    border: coverImage ? 'none' : '2px dashed rgba(255,255,255,0.7)',
+                    bgcolor: coverDrag
+                      ? 'rgba(25,118,210,0.4)'
+                      : coverImage
+                        ? 'rgba(0,0,0,0)'
+                        : 'rgba(0,0,0,0.35)',
+                    opacity: coverImage && !coverDrag ? 0 : 1,
+                    transition: 'opacity .2s, background-color .2s',
+                    '&:hover': { opacity: 1, bgcolor: 'rgba(0,0,0,0.45)' },
+                  }}
+                >
+                  <Stack alignItems="center" spacing={0.75}>
+                    <CloudUploadRoundedIcon />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {coverDrag
+                        ? 'Drop to set cover'
+                        : coverImage
+                          ? 'Click or drop to replace'
+                          : 'Upload a cover photo'}
+                    </Typography>
+                    {!coverImage && (
+                      <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                        drag &amp; drop — the outfit’s look
+                      </Typography>
+                    )}
+                  </Stack>
+                </Box>
+              )}
             </Box>
+
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={(e) => {
+                readCover(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
+
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
-              <ToggleButtonGroup
-                exclusive
-                value={layout}
-                onChange={(_, v) => v && setLayout(v)}
-                size="small"
-              >
+              <ToggleButtonGroup exclusive value={layout} onChange={(_, v) => v && setLayout(v)} size="small">
                 {LAYOUTS.map((l) => (
                   <ToggleButton key={l.value} value={l.value} sx={{ px: 2, gap: 0.75 }}>
                     {l.icon}
@@ -138,6 +218,19 @@ export function OutfitEditorPage() {
                 ))}
               </ToggleButtonGroup>
             </Stack>
+
+            {layout === 'cover' && coverImage && (
+              <Stack direction="row" justifyContent="center" sx={{ mt: 1 }}>
+                <Button
+                  size="small"
+                  color="error"
+                  startIcon={<DeleteOutlineRoundedIcon />}
+                  onClick={() => setCoverImage(undefined)}
+                >
+                  Remove cover
+                </Button>
+              </Stack>
+            )}
           </Box>
         </Grid>
 

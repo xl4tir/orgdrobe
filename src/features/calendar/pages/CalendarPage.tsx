@@ -136,7 +136,7 @@ export function CalendarPage() {
               sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center', cursor: 'pointer', '&:hover': { boxShadow: (t) => t.shadows[3] } }}
             >
               <Box sx={{ width: 72, flexShrink: 0 }}>
-                <OutfitVisual garments={resolveGarments(o.garmentIds)} layout={o.layout} ratio="1 / 1" />
+                <OutfitVisual garments={resolveGarments(o.garmentIds)} layout={o.layout} coverImage={o.coverImage} ratio="1 / 1" />
               </Box>
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>

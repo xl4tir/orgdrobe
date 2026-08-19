@@ -36,6 +36,8 @@ export interface Outfit {
   name: string
   description: string
   garmentIds: string[]
+  /** A separately-uploaded cover photo (the outfit's "look"). Shown in the Cover layout. */
+  coverImage?: string
   layout: OutfitLayout
   seasons: Season[]
   timesWorn: number

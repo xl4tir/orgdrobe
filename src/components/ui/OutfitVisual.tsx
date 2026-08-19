@@ -5,12 +5,14 @@ import { GarmentVisual } from './GarmentVisual'
 interface OutfitVisualProps {
   garments: Garment[]
   layout: OutfitLayout
+  /** Separately-uploaded cover photo (used by the 'cover' layout). */
+  coverImage?: string
   ratio?: string
   sx?: SxProps<Theme>
 }
 
 /** Renders an outfit three ways, mirroring the Figma card variants. */
-export function OutfitVisual({ garments, layout, ratio = '4 / 5', sx }: OutfitVisualProps) {
+export function OutfitVisual({ garments, layout, coverImage, ratio = '4 / 5', sx }: OutfitVisualProps) {
   const items = garments.slice(0, 8)
 
   return (
@@ -26,9 +28,17 @@ export function OutfitVisual({ garments, layout, ratio = '4 / 5', sx }: OutfitVi
         ...sx,
       }}
     >
-      {layout === 'cover' && garments[0] && (
-        <GarmentVisual garment={garments[0]} ratio={ratio} radius={18} sx={{ height: '100%' }} />
-      )}
+      {layout === 'cover' &&
+        (coverImage ? (
+          <Box
+            component="img"
+            src={coverImage}
+            alt=""
+            sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : garments[0] ? (
+          <GarmentVisual garment={garments[0]} ratio={ratio} radius={18} sx={{ height: '100%' }} />
+        ) : null)}
 
       {layout === 'grid' && (
         <Box

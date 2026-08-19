@@ -128,7 +128,7 @@ export function FeedPage() {
                   {verbose && (
                     <Box sx={{ width: 64, flexShrink: 0 }}>
                       {resolved.kind === 'outfit' ? (
-                        <OutfitVisual garments={resolved.pieces} layout={resolved.outfit.layout} ratio="1 / 1" />
+                        <OutfitVisual garments={resolved.pieces} layout={resolved.outfit.layout} coverImage={resolved.outfit.coverImage} ratio="1 / 1" />
                       ) : (
                         <GarmentVisual garment={resolved.garment} ratio="1 / 1" radius={10} showSwatches={false} />
                       )}

@@ -42,7 +42,7 @@ export function OutfitCard({ outfit }: { outfit: Outfit }) {
       }}
     >
       <Box sx={{ position: 'relative', p: 1.25, pb: 0 }}>
-        <OutfitVisual garments={items} layout={outfit.layout} />
+        <OutfitVisual garments={items} layout={outfit.layout} coverImage={outfit.coverImage} />
         <Chip
           label={LAYOUT_LABEL[outfit.layout]}
           size="small"
