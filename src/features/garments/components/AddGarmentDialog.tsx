@@ -18,9 +18,12 @@ import CheckRoundedIcon from '@mui/icons-material/CheckRounded'
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
 import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
+import ColorizeRoundedIcon from '@mui/icons-material/ColorizeRounded'
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GarmentVisual } from '@/components/ui/GarmentVisual'
 import { COLORS, getColor } from '@/lib/colors'
+import { detectCatalogColors, nearestColorId, eyedropperSupported } from '@/lib/imageColor'
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -61,6 +64,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
   const [material, setMaterial] = useState('')
   const [image, setImage] = useState<string | undefined>(undefined)
   const [dragOver, setDragOver] = useState(false)
+  const [autoDetected, setAutoDetected] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -76,6 +80,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
       setMaterial('')
       setImage(undefined)
       setDragOver(false)
+      setAutoDetected(false)
     }
   }, [open])
 
@@ -83,9 +88,30 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
     if (!file || !file.type.startsWith('image/')) return
     const reader = new FileReader()
     reader.onload = () => {
-      if (typeof reader.result === 'string') setImage(reader.result)
+      if (typeof reader.result !== 'string') return
+      const url = reader.result
+      setImage(url)
+      // Auto-detect the garment's colours straight from the photo.
+      detectCatalogColors(url, 3).then((ids) => {
+        if (ids.length) {
+          setColors(ids)
+          setAutoDetected(true)
+        }
+      })
     }
     reader.readAsDataURL(file)
+  }
+
+  const canEyedrop = eyedropperSupported()
+  const pickWithEyedropper = async () => {
+    try {
+      const EyeDropperCtor = (window as unknown as { EyeDropper: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper
+      const { sRGBHex } = await new EyeDropperCtor().open()
+      const id = nearestColorId(sRGBHex)
+      setColors((prev) => (prev.includes(id) ? prev : [...prev, id]))
+    } catch {
+      /* user cancelled the eyedropper */
+    }
   }
 
   const openFilePicker = () => fileInputRef.current?.click()
@@ -357,7 +383,23 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
               </Box>
 
               <Box>
-                <FieldLabel>Colours (optional)</FieldLabel>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                  <Typography variant="overline" color="text.secondary">
+                    Colours
+                  </Typography>
+                  {canEyedrop && (
+                    <Button
+                      size="small"
+                      variant="text"
+                      startIcon={<ColorizeRoundedIcon sx={{ fontSize: 18 }} />}
+                      onClick={pickWithEyedropper}
+                      disabled={!image}
+                      sx={{ minWidth: 0, py: 0.25 }}
+                    >
+                      Pick from photo
+                    </Button>
+                  )}
+                </Stack>
                 <Box
                   sx={{
                     display: 'grid',
@@ -404,17 +446,23 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
                 <Box sx={{ minHeight: 22, mt: 1 }}>
                   <AnimatePresence>
                     {colors.length > 0 && (
-                      <Typography
-                        component={motion.p}
+                      <Stack
+                        component={motion.div}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        variant="caption"
-                        color="text.secondary"
+                        direction="row"
+                        alignItems="center"
+                        spacing={0.5}
                       >
-                        Dominant colour:{' '}
-                        <b>{COLORS.find((c) => c.id === colors[0])?.name ?? colors[0]}</b>
-                      </Typography>
+                        {autoDetected && (
+                          <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                        )}
+                        <Typography variant="caption" color="text.secondary">
+                          {autoDetected ? 'Detected from photo — tap to adjust · ' : ''}
+                          Dominant: <b>{getColor(colors[0]).name}</b>
+                        </Typography>
+                      </Stack>
                     )}
                   </AnimatePresence>
                 </Box>
