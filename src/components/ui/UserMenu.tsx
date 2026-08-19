@@ -36,7 +36,7 @@ export function UserMenu() {
             height: 36,
             fontSize: '0.85rem',
             fontWeight: 700,
-            background: (t) => t.custom.gradients.brand,
+            bgcolor: 'primary.main',
           }}
         >
           {initials(name)}

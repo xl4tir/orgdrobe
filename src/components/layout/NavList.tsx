@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { List, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material'
+import { alpha, List, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material'
 import { motion } from 'framer-motion'
 import { NAV_ITEMS } from '@/app/navigation'
 
@@ -31,8 +31,7 @@ export function NavList({ onNavigate }: NavListProps) {
                 color: isActive ? 'primary.main' : 'text.secondary',
                 fontWeight: 700,
                 '&.Mui-selected, &.Mui-selected:hover': {
-                  bgcolor: (t) =>
-                    t.palette.mode === 'light' ? 'primary.50' : 'rgba(142,123,255,0.14)',
+                  bgcolor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'light' ? 0.1 : 0.22),
                 },
                 '&:hover': { color: 'text.primary' },
               }}

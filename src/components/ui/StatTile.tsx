@@ -1,4 +1,4 @@
-import { Box, Card, Stack, Typography } from '@mui/material'
+import { alpha, Box, Card, Stack, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { riseItem } from '@/theme/motion'
@@ -32,14 +32,14 @@ export function StatTile({ label, value, hint, icon, accent = 'primary.main' }: 
               width: 34,
               height: 34,
               borderRadius: 2,
-              bgcolor: (t) => (t.palette.mode === 'light' ? 'grey.100' : 'rgba(255,255,255,0.05)'),
+              bgcolor: (t) => alpha(t.palette.primary.main, 0.12),
             }}
           >
             {icon}
           </Box>
         )}
       </Stack>
-      <Typography variant="h4" sx={{ mt: 1, fontFamily: '"Fraunces Variable", serif' }}>
+      <Typography variant="h4" sx={{ mt: 1 }}>
         {value}
       </Typography>
       {hint && (

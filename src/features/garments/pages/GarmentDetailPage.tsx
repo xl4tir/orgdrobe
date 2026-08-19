@@ -281,7 +281,7 @@ export function GarmentDetailPage() {
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <Box>
-      <Typography variant="h5" sx={{ fontFamily: '"Fraunces Variable", serif' }}>
+      <Typography variant="h5">
         {value}
       </Typography>
       <Typography variant="caption" color="text.secondary">

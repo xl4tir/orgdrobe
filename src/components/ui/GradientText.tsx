@@ -1,17 +1,12 @@
-import { Box, type BoxProps, useTheme } from '@mui/material'
+import { Box, type BoxProps } from '@mui/material'
 
-/** Text painted with the brand gradient. Use sparingly, for hero moments. */
+/** Emphasis text painted in a solid primary colour. Use sparingly, for hero moments. */
 export function GradientText({ children, sx, ...rest }: BoxProps) {
-  const theme = useTheme()
   return (
     <Box
       component="span"
       sx={{
-        background: theme.custom.gradients.brandVivid,
-        WebkitBackgroundClip: 'text',
-        backgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        color: 'transparent',
+        color: 'primary.main',
         ...sx,
       }}
       {...rest}

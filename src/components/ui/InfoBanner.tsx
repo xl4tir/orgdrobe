@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, type SxProps, type Theme } from '@mui/material'
+import { alpha, Box, Stack, Typography, type SxProps, type Theme } from '@mui/material'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
@@ -22,9 +22,8 @@ export function InfoBanner({ icon, children, sx }: InfoBannerProps) {
         px: 2,
         py: 1.25,
         borderRadius: 3,
-        border: (t) => `1px solid ${t.palette.primary.main}33`,
-        bgcolor: (t) =>
-          t.palette.mode === 'light' ? 'primary.50' : 'rgba(142,123,255,0.10)',
+        border: (t) => `1px solid ${alpha(t.palette.primary.main, 0.2)}`,
+        bgcolor: (t) => alpha(t.palette.primary.main, t.palette.mode === 'light' ? 0.06 : 0.12),
         color: 'text.secondary',
         ...sx,
       }}

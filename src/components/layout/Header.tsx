@@ -23,15 +23,9 @@ export function Header({ onOpenMenu }: { onOpenMenu: () => void }) {
   return (
     <AppBar
       position="sticky"
-      elevation={0}
-      color="transparent"
-      sx={{
-        backdropFilter: 'saturate(180%) blur(14px)',
-        backgroundColor: (t) =>
-          t.palette.mode === 'light' ? 'rgba(250,248,244,0.94)' : 'rgba(20,17,25,0.94)',
-        borderBottom: (t) => `1px solid ${t.palette.divider}`,
-        width: '100%',
-      }}
+      elevation={1}
+      color="default"
+      sx={{ width: '100%' }}
     >
       <Toolbar sx={{ gap: 1, minHeight: 'var(--header-height) !important' }}>
         <IconButton

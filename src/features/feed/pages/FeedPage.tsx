@@ -122,7 +122,7 @@ export function FeedPage() {
                     alignItems: 'center',
                     gap: 2,
                     transition: 'transform .2s, box-shadow .2s',
-                    '&:hover': { transform: 'translateX(4px)', boxShadow: (t) => t.custom.softShadows.sm },
+                    '&:hover': { transform: 'translateX(4px)', boxShadow: (t) => t.shadows[3] },
                   }}
                 >
                   {verbose && (

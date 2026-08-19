@@ -29,7 +29,7 @@ export const createAppTheme = (mode: PaletteMode): Theme => {
   const theme = createTheme({
     palette: getPalette(mode),
     typography,
-    shape: { borderRadius: radii.md },
+    shape: { borderRadius: 4 },
     spacing: 8,
     components: getComponents(),
     custom: { gradients, radii, softShadows },

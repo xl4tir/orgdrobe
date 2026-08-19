@@ -64,7 +64,7 @@ export function SettingsPage() {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
-                sx={{ width: 76, height: 76, fontSize: '1.6rem', fontWeight: 700, background: (t) => t.custom.gradients.brand }}
+                sx={{ width: 76, height: 76, fontSize: '1.6rem', fontWeight: 700, bgcolor: 'primary.main' }}
               >
                 {initials(name || 'U')}
               </Avatar>

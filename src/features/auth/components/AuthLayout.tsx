@@ -23,7 +23,7 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
           position: 'relative',
           width: '46%',
           overflow: 'hidden',
-          background: (t) => t.custom.gradients.irisGlow,
+          bgcolor: 'primary.main',
         }}
       >
         {FLOATERS.map((f, i) => (
@@ -55,7 +55,6 @@ export function AuthLayout({ children, title, subtitle }: { children: ReactNode;
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.12) 0%, transparent 30%, rgba(0,0,0,0.35) 100%)',
           }}
         >
           <Logo onDark />

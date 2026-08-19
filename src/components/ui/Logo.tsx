@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 
 interface LogoProps {
   size?: number
@@ -8,7 +8,6 @@ interface LogoProps {
 
 /** The OrgDrobe mark + wordmark. The "O" hanger echoes the favicon. */
 export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoProps) {
-  const theme = useTheme()
   return (
     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.1 }}>
       <Box
@@ -16,10 +15,9 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
           width: size,
           height: size,
           borderRadius: `${size * 0.32}px`,
-          background: theme.custom.gradients.brand,
+          bgcolor: 'primary.main',
           display: 'grid',
           placeItems: 'center',
-          boxShadow: '0 6px 16px rgba(102,80,230,0.35)',
           flexShrink: 0,
         }}
       >
@@ -35,7 +33,6 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
         <Typography
           component="span"
           sx={{
-            fontFamily: '"Fraunces Variable", serif',
             fontWeight: 600,
             fontSize: size * 0.62,
             letterSpacing: '-0.02em',

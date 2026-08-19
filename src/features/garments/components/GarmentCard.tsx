@@ -27,7 +27,7 @@ export function GarmentCard({ garment }: { garment: Garment }) {
         display: 'flex',
         flexDirection: 'column',
         transition: 'box-shadow .3s',
-        '&:hover': { boxShadow: (t) => t.custom.softShadows.md },
+        '&:hover': { boxShadow: (t) => t.shadows[6] },
         '&:hover .garment-visual': { transform: 'scale(1.045)' },
       }}
     >

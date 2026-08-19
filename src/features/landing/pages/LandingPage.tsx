@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Container, Grid2 as Grid, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Container, Grid2 as Grid, Stack, Typography } from '@mui/material'
 import CheckroomRoundedIcon from '@mui/icons-material/CheckroomRounded'
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded'
@@ -77,8 +77,7 @@ export function LandingPage() {
           position: 'sticky',
           top: 0,
           zIndex: 10,
-          backdropFilter: 'saturate(180%) blur(14px)',
-          backgroundColor: (t) => (t.palette.mode === 'light' ? 'rgba(250,248,244,0.7)' : 'rgba(20,17,25,0.7)'),
+          bgcolor: 'background.paper',
           borderBottom: (t) => `1px solid ${t.palette.divider}`,
         }}
       >
@@ -189,38 +188,36 @@ export function LandingPage() {
             {FEATURES.map((f, i) => (
               <Grid key={f.title} size={{ xs: 12, sm: 6, md: 3 }}>
                 <Reveal delay={i * 0.08}>
-                  <Box
+                  <Card
                     sx={{
-                      p: 3,
                       height: '100%',
-                      borderRadius: 4,
-                      border: (t) => `1px solid ${t.palette.divider}`,
-                      bgcolor: 'background.default',
                       transition: 'transform .3s, box-shadow .3s',
-                      '&:hover': { transform: 'translateY(-6px)', boxShadow: (t) => t.custom.softShadows.md },
+                      '&:hover': { transform: 'translateY(-6px)', boxShadow: 6 },
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 3,
-                        display: 'grid',
-                        placeItems: 'center',
-                        color: '#fff',
-                        background: `linear-gradient(135deg, ${f.color}, ${f.color}bb)`,
-                        mb: 2,
-                      }}
-                    >
-                      {f.icon}
-                    </Box>
-                    <Typography variant="h6" sx={{ mb: 1 }}>
-                      {f.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {f.text}
-                    </Typography>
-                  </Box>
+                    <CardContent sx={{ p: 3 }}>
+                      <Box
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 1,
+                          display: 'grid',
+                          placeItems: 'center',
+                          color: 'primary.contrastText',
+                          bgcolor: 'primary.main',
+                          mb: 2,
+                        }}
+                      >
+                        {f.icon}
+                      </Box>
+                      <Typography variant="h6" sx={{ mb: 1 }}>
+                        {f.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {f.text}
+                      </Typography>
+                    </CardContent>
+                  </Card>
                 </Reveal>
               </Grid>
             ))}
@@ -238,8 +235,8 @@ export function LandingPage() {
               borderRadius: 6,
               p: { xs: 4, md: 8 },
               textAlign: 'center',
-              color: '#fff',
-              background: (t) => t.custom.gradients.brandVivid,
+              color: 'primary.contrastText',
+              bgcolor: 'primary.main',
             }}
           >
             <Typography variant="h2" sx={{ mb: 2 }}>

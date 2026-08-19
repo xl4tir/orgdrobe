@@ -37,7 +37,8 @@ export function OutfitCard({ outfit }: { outfit: Outfit }) {
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        '&:hover': { boxShadow: (t) => t.custom.softShadows.md },
+        transition: 'box-shadow .3s',
+        '&:hover': { boxShadow: (t) => t.shadows[6] },
       }}
     >
       <Box sx={{ position: 'relative', p: 1.25, pb: 0 }}>

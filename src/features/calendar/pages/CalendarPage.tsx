@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Card, Stack, Typography } from '@mui/material'
+import { alpha, Box, Card, Stack, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
 import { PageContainer } from '@/components/ui/PageContainer'
 import { SectionHeader } from '@/components/ui/SectionHeader'
@@ -94,7 +94,7 @@ export function CalendarPage() {
                   bgcolor: isSelected
                     ? 'primary.main'
                     : worn
-                      ? (t) => (t.palette.mode === 'light' ? 'primary.50' : 'rgba(142,123,255,0.12)')
+                      ? (t) => alpha(t.palette.primary.main, t.palette.mode === 'light' ? 0.1 : 0.2)
                       : 'transparent',
                   color: isSelected ? 'primary.contrastText' : 'text.primary',
                   transition: 'background-color .2s',
@@ -133,7 +133,7 @@ export function CalendarPage() {
             <Card
               key={o.id}
               onClick={() => navigate(`/app/outfits/${o.id}`)}
-              sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center', cursor: 'pointer', '&:hover': { boxShadow: (t) => t.custom.softShadows.sm } }}
+              sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center', cursor: 'pointer', '&:hover': { boxShadow: (t) => t.shadows[3] } }}
             >
               <Box sx={{ width: 72, flexShrink: 0 }}>
                 <OutfitVisual garments={resolveGarments(o.garmentIds)} layout={o.layout} ratio="1 / 1" />

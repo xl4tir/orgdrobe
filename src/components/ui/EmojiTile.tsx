@@ -1,7 +1,6 @@
-import { Box, useTheme, type SxProps, type Theme } from '@mui/material'
+import { alpha, Box, useTheme, type SxProps, type Theme } from '@mui/material'
 import type { GarmentCategory } from '@/types/domain'
 import { getColor } from '@/lib/colors'
-import { lighten, mix } from '@/lib/colorUtils'
 import { CATEGORY_EMOJI } from '@/lib/categoryVisual'
 
 interface EmojiTileProps {
@@ -33,9 +32,8 @@ export function EmojiTile({
   const isLight = theme.palette.mode === 'light'
   const primary = getColor(colors[0]).hex
 
-  const bg = isLight
-    ? `linear-gradient(160deg, ${lighten(primary, 0.72)} 0%, ${lighten(primary, 0.46)} 100%)`
-    : `linear-gradient(160deg, ${mix(primary, '#17151C', 0.55)} 0%, ${mix(primary, '#17151C', 0.8)} 100%)`
+  // Flat Material tonal container — a solid tint of the dominant colour.
+  const bg = alpha(primary, isLight ? 0.14 : 0.24)
 
   return (
     <Box
@@ -46,23 +44,13 @@ export function EmojiTile({
         aspectRatio: ratio,
         borderRadius: `${radius}px`,
         overflow: 'hidden',
-        background: bg,
+        bgcolor: bg,
         display: 'grid',
         placeItems: 'center',
-        boxShadow: isLight ? 'inset 0 0 0 1px rgba(0,0,0,0.05)' : 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+        boxShadow: theme.shadows[1],
         ...sx,
       }}
     >
-      <Box
-        aria-hidden
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          background: `radial-gradient(120% 80% at 26% 12%, ${
-            isLight ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.08)'
-          } 0%, transparent 60%)`,
-        }}
-      />
       <Box
         component="span"
         sx={{

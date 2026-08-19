@@ -1,75 +1,40 @@
 import type { PaletteMode, PaletteOptions } from '@mui/material'
-import { brand, neutral } from './tokens'
 
+/**
+ * Material Design 3 baseline palette (purple primary). Kept close to the
+ * reference tokens so the app reads as stock Material, light and dark.
+ */
 export const getPalette = (mode: PaletteMode): PaletteOptions =>
   mode === 'light'
     ? {
         mode,
-        primary: {
-          main: brand.iris[500],
-          light: brand.iris[400],
-          dark: brand.iris[700],
-          contrastText: '#FFFFFF',
-        },
-        secondary: {
-          main: brand.coral[500],
-          light: brand.coral[400],
-          dark: brand.coral[700],
-          contrastText: '#FFFFFF',
-        },
-        success: { main: brand.sage, contrastText: '#FFFFFF' },
-        warning: { main: brand.amber, contrastText: '#3A2A08' },
-        info: { main: brand.sky, contrastText: '#FFFFFF' },
-        error: { main: brand.danger, contrastText: '#FFFFFF' },
-        background: {
-          default: neutral[50],
-          paper: neutral[0],
-        },
+        primary: { main: '#6750A4', light: '#8069C7', dark: '#4F378B', contrastText: '#FFFFFF' },
+        secondary: { main: '#625B71', light: '#7E7690', dark: '#4A4458', contrastText: '#FFFFFF' },
+        error: { main: '#BA1A1A', contrastText: '#FFFFFF' },
+        warning: { main: '#F9A825', contrastText: '#1D1B20' },
+        info: { main: '#0061A4', contrastText: '#FFFFFF' },
+        success: { main: '#146C2E', contrastText: '#FFFFFF' },
+        background: { default: '#F7F2FA', paper: '#FFFFFF' },
         text: {
-          primary: neutral[900],
-          secondary: neutral[600],
-          disabled: neutral[400],
+          primary: '#1D1B20',
+          secondary: '#49454F',
+          disabled: 'rgba(29,27,32,0.38)',
         },
-        divider: 'rgba(27, 23, 18, 0.10)',
-        grey: {
-          50: neutral[50],
-          100: neutral[100],
-          200: neutral[200],
-          300: neutral[300],
-          400: neutral[400],
-          500: neutral[500],
-          600: neutral[600],
-          700: neutral[700],
-          800: neutral[800],
-          900: neutral[900],
-        },
+        divider: 'rgba(29,27,32,0.12)',
       }
     : {
         mode,
-        primary: {
-          main: brand.iris[400],
-          light: brand.iris[300],
-          dark: brand.iris[600],
-          contrastText: '#12100C',
-        },
-        secondary: {
-          main: brand.coral[400],
-          light: brand.coral[300],
-          dark: brand.coral[600],
-          contrastText: '#12100C',
-        },
-        success: { main: '#3FB98C', contrastText: '#08130E' },
-        warning: { main: brand.amber, contrastText: '#3A2A08' },
-        info: { main: '#5AA6F0', contrastText: '#07131F' },
-        error: { main: '#F0656A', contrastText: '#1F0708' },
-        background: {
-          default: '#141119',
-          paper: '#1E1A28',
-        },
+        primary: { main: '#D0BCFF', light: '#E8DEF8', dark: '#B69DF8', contrastText: '#381E72' },
+        secondary: { main: '#CCC2DC', light: '#E8DEF8', dark: '#B0A7C0', contrastText: '#332D41' },
+        error: { main: '#FFB4AB', contrastText: '#690005' },
+        warning: { main: '#F9A825', contrastText: '#1D1B20' },
+        info: { main: '#9ECAFF', contrastText: '#003258' },
+        success: { main: '#7CDB8A', contrastText: '#00390F' },
+        background: { default: '#141218', paper: '#211F26' },
         text: {
-          primary: '#F4F0EA',
-          secondary: '#A9A2B6',
-          disabled: '#6B6479',
+          primary: '#E6E0E9',
+          secondary: '#CAC4D0',
+          disabled: 'rgba(230,224,233,0.38)',
         },
-        divider: 'rgba(255, 255, 255, 0.10)',
+        divider: 'rgba(230,224,233,0.14)',
       }

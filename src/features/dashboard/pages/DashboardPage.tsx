@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Card, Grid2 as Grid, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, CardActionArea, Grid2 as Grid, Stack, Typography } from '@mui/material'
 import CheckroomRoundedIcon from '@mui/icons-material/CheckroomRounded'
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded'
@@ -149,43 +149,40 @@ function FastNavCard({
   onClick: () => void
 }) {
   return (
-    <Card
-      component={motion.div}
-      whileHover={{ y: -4 }}
-      onClick={onClick}
-      sx={{
-        p: 3,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        border: 'none',
-        color: '#fff',
-        background: (t) =>
-          accent ? t.custom.gradients.brand : 'linear-gradient(135deg, #2A2740 0%, #1C1A2B 100%)',
-        boxShadow: (t) => t.custom.softShadows.md,
-      }}
-    >
-      <Box
+    <Card component={motion.div} whileHover={{ y: -4 }} sx={{ height: '100%' }}>
+      <CardActionArea
+        onClick={onClick}
         sx={{
-          width: 52,
-          height: 52,
-          borderRadius: 3,
-          display: 'grid',
-          placeItems: 'center',
-          bgcolor: 'rgba(255,255,255,0.16)',
-          flexShrink: 0,
+          p: 3,
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          bgcolor: accent ? 'secondary.main' : 'primary.main',
+          color: accent ? 'secondary.contrastText' : 'primary.contrastText',
         }}
       >
-        {icon}
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="body2" sx={{ opacity: 0.85 }}>
-          {subtitle}
-        </Typography>
-      </Box>
-      <EastRoundedIcon />
+        <Box
+          sx={{
+            width: 52,
+            height: 52,
+            borderRadius: 2,
+            display: 'grid',
+            placeItems: 'center',
+            bgcolor: 'rgba(255,255,255,0.16)',
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6">{title}</Typography>
+          <Typography variant="body2" sx={{ opacity: 0.85 }}>
+            {subtitle}
+          </Typography>
+        </Box>
+        <EastRoundedIcon />
+      </CardActionArea>
     </Card>
   )
 }

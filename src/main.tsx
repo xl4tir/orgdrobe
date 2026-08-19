@@ -1,9 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-// Bundled variable fonts — no network needed, no layout shift.
-import '@fontsource-variable/manrope'
-import '@fontsource-variable/fraunces'
+// Roboto — Material Design's type family.
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/roboto/700.css'
 
 import './styles/global.css'
 import { AppProviders } from './app/providers/AppProviders'
