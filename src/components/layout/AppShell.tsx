@@ -7,12 +7,16 @@ import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { NavList } from './NavList'
 import { Logo } from '@/components/ui/Logo'
+import { AddGarmentDialog } from '@/features/garments/components/AddGarmentDialog'
+import { useUiStore } from '@/app/uiStore'
 import { pageVariants } from '@/theme/motion'
 
 /** The authenticated app frame: sidebar (desktop), header, bottom nav (mobile). */
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
+  const addGarmentOpen = useUiStore((s) => s.addGarmentOpen)
+  const closeAddGarment = useUiStore((s) => s.closeAddGarment)
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -55,6 +59,9 @@ export function AppShell() {
       </Box>
 
       <BottomNav />
+
+      {/* App-wide Add garment dialog — opens over any page, no navigation. */}
+      <AddGarmentDialog open={addGarmentOpen} onClose={closeAddGarment} />
     </Box>
   )
 }

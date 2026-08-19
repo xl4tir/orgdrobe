@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 import { Badge, Box, Button, Stack } from '@mui/material'
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
@@ -10,15 +9,14 @@ import { SearchBar } from '@/components/ui/SearchBar'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { InfoBanner } from '@/components/ui/InfoBanner'
 import { pluralize } from '@/lib/format'
+import { useUiStore } from '@/app/uiStore'
 import { useGarmentStore, applyGarmentFilters, countActiveFilters } from '../store'
 import { FiltersPanel } from '../components/FiltersPanel'
 import { GarmentGrid } from '../components/GarmentGrid'
-import { AddGarmentDialog } from '../components/AddGarmentDialog'
 
 export function GarmentsPage() {
   const [showFilters, setShowFilters] = useState(false)
-  const [addOpen, setAddOpen] = useState(false)
-  const [searchParams, setSearchParams] = useSearchParams()
+  const openAddGarment = useUiStore((s) => s.openAddGarment)
   const garments = useGarmentStore((s) => s.garments)
   const filters = useGarmentStore((s) => s.filters)
   const setSearch = useGarmentStore((s) => s.setSearch)
@@ -26,19 +24,6 @@ export function GarmentsPage() {
 
   const list = useMemo(() => applyGarmentFilters(garments, filters), [garments, filters])
   const activeCount = countActiveFilters(filters)
-
-  // Open the dialog when arriving via the sidebar's "?add=1" link.
-  useEffect(() => {
-    if (searchParams.get('add') === '1') setAddOpen(true)
-  }, [searchParams])
-
-  const handleClose = () => {
-    setAddOpen(false)
-    if (searchParams.has('add')) {
-      searchParams.delete('add')
-      setSearchParams(searchParams, { replace: true })
-    }
-  }
 
   return (
     <PageContainer>
@@ -51,7 +36,7 @@ export function GarmentsPage() {
             variant="contained"
             size="large"
             startIcon={<AddRoundedIcon />}
-            onClick={() => setAddOpen(true)}
+            onClick={openAddGarment}
           >
             Add garment
           </Button>
@@ -101,8 +86,6 @@ export function GarmentsPage() {
           onAction={resetFilters}
         />
       )}
-
-      <AddGarmentDialog open={addOpen} onClose={handleClose} />
     </PageContainer>
   )
 }

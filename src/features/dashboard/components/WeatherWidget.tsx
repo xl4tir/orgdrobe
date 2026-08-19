@@ -1,22 +1,40 @@
-import { Box, Card, Stack, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import {
+  Box,
+  Button,
+  Card,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material'
 import AirRoundedIcon from '@mui/icons-material/AirRounded'
 import WaterDropRoundedIcon from '@mui/icons-material/WaterDropRounded'
 import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded'
 import WbTwilightRoundedIcon from '@mui/icons-material/WbTwilightRounded'
+import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded'
+import EditLocationAltRoundedIcon from '@mui/icons-material/EditLocationAltRounded'
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import { motion } from 'framer-motion'
-import type { Weather, WeatherCondition } from '@/types/domain'
 import { riseItem } from '@/theme/motion'
+import { CONDITION_COLORS, codeToCondition, codeToEmoji, codeToLabel } from '../wmo'
+import { useWeatherStore } from '../weatherStore'
+import { LocationPicker } from './LocationPicker'
 
-const CONDITION: Record<
-  WeatherCondition,
-  { emoji: string; label: string; color: string; from: string; to: string }
-> = {
-  sunny: { emoji: '☀️', label: 'Sunny', color: '#EF7A3D', from: '#FDB44B', to: '#FF7E5F' },
-  cloudy: { emoji: '⛅', label: 'Cloudy', color: '#5C7CB3', from: '#8EC5FC', to: '#7C93C3' },
-  rain: { emoji: '🌧️', label: 'Rainy', color: '#3E5C82', from: '#5B7CB3', to: '#3E5C82' },
-  snow: { emoji: '❄️', label: 'Snowy', color: '#6E8BB5', from: '#A7C7E7', to: '#C9D6DF' },
-  fog: { emoji: '🌫️', label: 'Foggy', color: '#71718A', from: '#B0AFC0', to: '#8A8AA0' },
-  storm: { emoji: '⛈️', label: 'Storm', color: '#2C2E43', from: '#4B4E6D', to: '#2C2E43' },
+/** "2026-08-19T20:34" → "20:34" */
+const hhmm = (iso: string) => iso.slice(11, 16)
+/** "2026-08-19T14:00" → "14:00" */
+const hourLabel = (iso: string) => `${iso.slice(11, 13)}:00`
+
+function dayLabel(date: string, index: number): string {
+  if (index === 0) return 'Today'
+  if (index === 1) return 'Tomorrow'
+  return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', { weekday: 'short' })
 }
 
 function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
@@ -35,8 +53,30 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
   )
 }
 
-export function WeatherWidget({ weather }: { weather: Weather }) {
-  const c = CONDITION[weather.condition]
+export function WeatherWidget() {
+  const location = useWeatherStore((s) => s.location)
+  const current = useWeatherStore((s) => s.current)
+  const hourly = useWeatherStore((s) => s.hourly)
+  const daily = useWeatherStore((s) => s.daily)
+  const status = useWeatherStore((s) => s.status)
+  const fetchWeather = useWeatherStore((s) => s.fetchWeather)
+
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [view, setView] = useState<'hourly' | 'daily'>('hourly')
+
+  useEffect(() => {
+    if (status === 'idle') void fetchWeather()
+  }, [status, fetchWeather])
+
+  const condition = current ? codeToCondition(current.code) : 'cloudy'
+  const c = CONDITION_COLORS[condition]
+  const today = daily[0]
+
+  // Next ~12 hours starting from the current hour.
+  const upcoming = current
+    ? hourly.filter((h) => h.time.slice(0, 13) >= current.time.slice(0, 13)).slice(0, 12)
+    : []
+
   return (
     <Card
       component={motion.div}
@@ -46,6 +86,8 @@ export function WeatherWidget({ weather }: { weather: Weather }) {
         overflow: 'hidden',
         color: '#fff',
         border: 'none',
+        width: '100%',
+        height: '100%',
         background: (t) =>
           t.custom.design === 'editorial'
             ? `linear-gradient(135deg, ${c.from} 0%, ${c.to} 100%)`
@@ -66,39 +108,183 @@ export function WeatherWidget({ weather }: { weather: Weather }) {
           userSelect: 'none',
         }}
       >
-        {c.emoji}
+        {codeToEmoji(current?.code ?? 3)}
       </Box>
 
-      <Stack sx={{ position: 'relative' }} spacing={2}>
-        <Box>
-          <Typography variant="overline" sx={{ opacity: 0.9 }}>
-            {weather.city} · Today
-          </Typography>
-          <Stack direction="row" alignItems="baseline" spacing={1}>
-            <Typography
-              sx={{
-                fontFamily: (t) =>
-                  t.custom.design === 'editorial' ? '"Fraunces Variable", serif' : undefined,
-                fontSize: '3.4rem',
-                lineHeight: 1,
-                fontWeight: 600,
-              }}
-            >
-              {weather.tempC}°
-            </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.95 }}>
-              {c.label}
+      <Stack sx={{ position: 'relative', height: '100%' }} spacing={2}>
+        {/* Header: location + change */}
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
+            <PlaceRoundedIcon fontSize="small" sx={{ opacity: 0.9 }} />
+            <Typography variant="overline" noWrap sx={{ opacity: 0.95, letterSpacing: 0.5 }}>
+              {location.name}
+              {location.country ? ` · ${location.country}` : ''}
             </Typography>
           </Stack>
-        </Box>
-
-        <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
-          <Metric icon={<WaterDropRoundedIcon fontSize="small" />} label="Humidity" value={`${weather.humidity}%`} />
-          <Metric icon={<AirRoundedIcon fontSize="small" />} label="Wind" value={`${weather.windKmh} km/h`} />
-          <Metric icon={<WbSunnyRoundedIcon fontSize="small" />} label="UV index" value={`${weather.uvIndex}`} />
-          <Metric icon={<WbTwilightRoundedIcon fontSize="small" />} label="Sunset" value={weather.sunset} />
+          <IconButton
+            size="small"
+            onClick={() => setPickerOpen(true)}
+            aria-label="Change location"
+            sx={{ color: '#fff', opacity: 0.9, flexShrink: 0 }}
+          >
+            <EditLocationAltRoundedIcon fontSize="small" />
+          </IconButton>
         </Stack>
+
+        {status === 'error' ? (
+          <Stack spacing={1.5} alignItems="flex-start" sx={{ py: 2 }}>
+            <Typography variant="body2" sx={{ opacity: 0.95 }}>
+              Couldn’t load weather.
+            </Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<RefreshRoundedIcon />}
+              onClick={() => void fetchWeather()}
+              sx={{ color: '#fff', borderColor: 'rgba(255,255,255,0.6)' }}
+            >
+              Retry
+            </Button>
+          </Stack>
+        ) : !current ? (
+          <Stack alignItems="center" justifyContent="center" sx={{ flex: 1, py: 4 }}>
+            <CircularProgress color="inherit" size={28} />
+          </Stack>
+        ) : (
+          <>
+            {/* Current */}
+            <Box>
+              <Stack direction="row" alignItems="baseline" spacing={1}>
+                <Typography
+                  sx={{
+                    fontFamily: (t) =>
+                      t.custom.design === 'editorial' ? '"Fraunces Variable", serif' : undefined,
+                    fontSize: '3.4rem',
+                    lineHeight: 1,
+                    fontWeight: 600,
+                  }}
+                >
+                  {Math.round(current.temperature)}°
+                </Typography>
+                <Typography variant="h6" sx={{ opacity: 0.95 }}>
+                  {codeToLabel(current.code)} {codeToEmoji(current.code)}
+                </Typography>
+              </Stack>
+            </Box>
+
+            {/* Metrics */}
+            <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+              <Metric
+                icon={<WaterDropRoundedIcon fontSize="small" />}
+                label="Humidity"
+                value={`${Math.round(current.humidity)}%`}
+              />
+              <Metric
+                icon={<AirRoundedIcon fontSize="small" />}
+                label="Wind"
+                value={`${Math.round(current.windSpeed)} km/h`}
+              />
+              <Metric
+                icon={<WbSunnyRoundedIcon fontSize="small" />}
+                label="UV index"
+                value={today ? `${Math.round(today.uvMax)}` : '—'}
+              />
+              <Metric
+                icon={<WbTwilightRoundedIcon fontSize="small" />}
+                label="Sunset"
+                value={today ? hhmm(today.sunset) : '—'}
+              />
+            </Stack>
+
+            {/* Hourly | 7-day toggle */}
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              value={view}
+              onChange={(_, v) => v && setView(v)}
+              sx={{
+                alignSelf: 'flex-start',
+                '& .MuiToggleButton-root': {
+                  color: 'rgba(255,255,255,0.85)',
+                  borderColor: 'rgba(255,255,255,0.35)',
+                  px: 1.5,
+                  py: 0.25,
+                  fontSize: '0.7rem',
+                  textTransform: 'none',
+                },
+                '& .Mui-selected': {
+                  color: '#fff !important',
+                  bgcolor: 'rgba(255,255,255,0.22) !important',
+                },
+              }}
+            >
+              <ToggleButton value="hourly">Hourly</ToggleButton>
+              <ToggleButton value="daily">7-day</ToggleButton>
+            </ToggleButtonGroup>
+
+            {view === 'hourly' ? (
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  overflowX: 'auto',
+                  pb: 0.5,
+                  // slim, subtle scrollbar on the coloured card
+                  '&::-webkit-scrollbar': { height: 6 },
+                  '&::-webkit-scrollbar-thumb': {
+                    bgcolor: 'rgba(255,255,255,0.3)',
+                    borderRadius: 3,
+                  },
+                }}
+              >
+                {upcoming.map((h) => (
+                  <Stack key={h.time} alignItems="center" spacing={0.5} sx={{ flexShrink: 0 }}>
+                    <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                      {hourLabel(h.time)}
+                    </Typography>
+                    <Box sx={{ fontSize: 18, lineHeight: 1 }}>{codeToEmoji(h.code)}</Box>
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                      {Math.round(h.temp)}°
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            ) : (
+              <Stack spacing={0.5}>
+                {daily.map((d, i) => (
+                  <Stack
+                    key={d.date}
+                    direction="row"
+                    alignItems="center"
+                    spacing={1.5}
+                    sx={{ py: 0.25 }}
+                  >
+                    <Typography variant="body2" sx={{ width: 72, opacity: 0.95 }}>
+                      {dayLabel(d.date, i)}
+                    </Typography>
+                    <Box sx={{ fontSize: 18, lineHeight: 1 }}>{codeToEmoji(d.code)}</Box>
+                    <Typography variant="body2" sx={{ ml: 'auto', fontWeight: 700 }}>
+                      {Math.round(d.max)}°{' '}
+                      <Box component="span" sx={{ opacity: 0.7, fontWeight: 500 }}>
+                        / {Math.round(d.min)}°
+                      </Box>
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            )}
+          </>
+        )}
       </Stack>
+
+      <Dialog open={pickerOpen} onClose={() => setPickerOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Change location</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Box sx={{ pt: 1 }}>
+            <LocationPicker onSelect={() => setPickerOpen(false)} />
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

@@ -17,15 +17,17 @@ import { useGarmentStore } from '@/features/garments/store'
 import { useOutfitStore } from '@/features/outfits/store'
 import { useAuthStore } from '@/features/auth/store'
 import { staggerContainer } from '@/theme/motion'
-import { MOCK_WEATHER } from '@/lib/mockData'
 import { WeatherWidget } from '../components/WeatherWidget'
 import { ColorBreakdown } from '../components/ColorBreakdown'
+import { useWeatherStore } from '../weatherStore'
+import { codeToCondition } from '../wmo'
 
 export function DashboardPage() {
   const navigate = useNavigate()
   const garments = useGarmentStore((s) => s.garments)
   const outfits = useOutfitStore((s) => s.outfits)
   const user = useAuthStore((s) => s.user)
+  const weather = useWeatherStore((s) => s.current)
 
   const stats = useMemo(() => {
     const wornTotal = garments.reduce((acc, g) => acc + g.timesWorn, 0)
@@ -47,7 +49,9 @@ export function DashboardPage() {
           Good {partOfDay}, <GradientText>{firstName}</GradientText>
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-          It’s {MOCK_WEATHER.tempC}° and {MOCK_WEATHER.condition} — here’s what’s worth wearing today.
+          {weather
+            ? `It’s ${Math.round(weather.temperature)}° and ${codeToCondition(weather.code)} — here’s what’s worth wearing today.`
+            : 'Here’s what’s worth wearing today.'}
         </Typography>
       </Box>
 
@@ -61,8 +65,8 @@ export function DashboardPage() {
         animate="animate"
         sx={{ mb: 5 }}
       >
-        <Grid size={{ xs: 12, md: 5 }}>
-          <WeatherWidget weather={MOCK_WEATHER} />
+        <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex' }}>
+          <WeatherWidget />
         </Grid>
         <Grid size={{ xs: 6, md: 3.5 }}>
           <Stack spacing={2.5} sx={{ height: '100%' }}>

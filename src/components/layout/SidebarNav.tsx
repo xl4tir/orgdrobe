@@ -1,14 +1,14 @@
 import { Box, Button, Typography } from '@mui/material'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
-import { useNavigate } from 'react-router-dom'
 import { Logo } from '@/components/ui/Logo'
+import { useUiStore } from '@/app/uiStore'
 import { NavList } from './NavList'
 
 export const SIDEBAR_WIDTH = 264
 
 /** Permanent left navigation for desktop (md and up). */
 export function SidebarNav() {
-  const navigate = useNavigate()
+  const openAddGarment = useUiStore((s) => s.openAddGarment)
   return (
     <Box
       component="aside"
@@ -37,7 +37,7 @@ export function SidebarNav() {
           fullWidth
           variant="contained"
           startIcon={<AddRoundedIcon />}
-          onClick={() => navigate('/app/garments?add=1')}
+          onClick={openAddGarment}
           sx={{ py: 1.2 }}
         >
           Add garment
