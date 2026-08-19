@@ -57,10 +57,10 @@ export function SettingsPage() {
 
   return (
     <PageContainer maxWidth="md">
-      <SectionHeader overline="Account" title="Settings" subtitle="Manage your profile, security and how OrgDrobe looks." />
+      <SectionHeader overline="Account" title="Settings" subtitle="Manage your profile, security and how Роздягальня looks." />
 
       <Stack spacing={3}>
-        <SettingsCard title="Profile" description="This is how you appear across OrgDrobe.">
+        <SettingsCard title="Profile" description="This is how you appear across Роздягальня.">
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
@@ -106,7 +106,7 @@ export function SettingsPage() {
           </Grid>
         </SettingsCard>
 
-        <SettingsCard title="Appearance" description="Choose how OrgDrobe looks on this device.">
+        <SettingsCard title="Appearance" description="Choose how Роздягальня looks on this device.">
           <ToggleButtonGroup exclusive value={mode} onChange={(_, v) => v && setMode(v)}>
             <ToggleButton value="light" sx={{ px: 3, gap: 1 }}>
               <LightModeRoundedIcon fontSize="small" /> Light

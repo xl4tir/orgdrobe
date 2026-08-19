@@ -43,9 +43,9 @@ export function Logo({ size = 34, showWordmark = true, onDark = false }: LogoPro
             lineHeight: 1,
           }}
         >
-          Org
+          Роздя
           <Box component="span" sx={{ color: onDark ? 'secondary.light' : 'primary.main' }}>
-            Drobe
+            гальня
           </Box>
         </Typography>
       )}

@@ -8,13 +8,11 @@ import {
   IconButton,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded'
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
 import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
@@ -22,8 +20,8 @@ import ColorizeRoundedIcon from '@mui/icons-material/ColorizeRounded'
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GarmentVisual } from '@/components/ui/GarmentVisual'
-import { COLORS, getColor } from '@/lib/colors'
-import { detectCatalogColors, nearestColorId, eyedropperSupported } from '@/lib/imageColor'
+import { getColor } from '@/lib/colors'
+import { detectDominantColors, normalizeHex, eyedropperSupported } from '@/lib/imageColor'
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -31,7 +29,6 @@ import {
   SEASON_LABELS,
   SEASON_EMOJI,
 } from '@/lib/catalog'
-import { readableOn } from '@/lib/colorUtils'
 import type { GarmentCategory, Season } from '@/types/domain'
 import { useGarmentStore } from '../store'
 
@@ -91,10 +88,10 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
       if (typeof reader.result !== 'string') return
       const url = reader.result
       setImage(url)
-      // Auto-detect the garment's colours straight from the photo.
-      detectCatalogColors(url, 3).then((ids) => {
-        if (ids.length) {
-          setColors(ids)
+      // Auto-detect the garment's colours straight from the photo (real hex values).
+      detectDominantColors(url, 3).then((hexes) => {
+        if (hexes.length) {
+          setColors(hexes)
           setAutoDetected(true)
         }
       })
@@ -107,8 +104,9 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
     try {
       const EyeDropperCtor = (window as unknown as { EyeDropper: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper
       const { sRGBHex } = await new EyeDropperCtor().open()
-      const id = nearestColorId(sRGBHex)
-      setColors((prev) => (prev.includes(id) ? prev : [...prev, id]))
+      const hex = normalizeHex(sRGBHex)
+      setColors((prev) => (prev.includes(hex) ? prev : [...prev, hex]))
+      setAutoDetected(false)
     } catch {
       /* user cancelled the eyedropper */
     }
@@ -400,71 +398,73 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
                     </Button>
                   )}
                 </Stack>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(34px, 1fr))',
-                    gap: 1,
-                  }}
-                >
-                  {COLORS.map((c) => {
-                    const active = colors.includes(c.id)
-                    return (
-                      <Tooltip key={c.id} title={c.name}>
+                {colors.length > 0 ? (
+                  <Stack direction="row" flexWrap="wrap" gap={1}>
+                    {colors.map((hex) => (
+                      <Box
+                        key={hex}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.75,
+                          pl: 0.75,
+                          pr: 0.75,
+                          py: 0.5,
+                          borderRadius: 999,
+                          border: (t) => `1px solid ${t.palette.divider}`,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: '50%',
+                            backgroundColor: getColor(hex).hex,
+                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.15)',
+                          }}
+                        />
+                        <Typography variant="caption" sx={{ fontWeight: 600, fontFamily: 'monospace' }}>
+                          {getColor(hex).hex.toUpperCase()}
+                        </Typography>
                         <Box
                           component="button"
                           type="button"
-                          onClick={() => setColors((prev) => toggleValue(prev, c.id))}
-                          aria-label={c.name}
-                          aria-pressed={active}
+                          aria-label={`Remove ${hex}`}
+                          onClick={() => setColors((prev) => prev.filter((c) => c !== hex))}
                           sx={{
-                            width: 34,
-                            height: 34,
-                            borderRadius: '50%',
-                            cursor: 'pointer',
-                            p: 0,
-                            backgroundColor: c.hex,
-                            border: 'none',
-                            outline: active
-                              ? (t) => `2.5px solid ${t.palette.primary.main}`
-                              : '2.5px solid transparent',
-                            outlineOffset: 2,
-                            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)',
                             display: 'grid',
                             placeItems: 'center',
-                            color: readableOn(c.hex),
-                            transition: 'transform .18s',
-                            '&:hover': { transform: 'scale(1.14)' },
+                            width: 18,
+                            height: 18,
+                            p: 0,
+                            border: 'none',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            bgcolor: 'transparent',
+                            color: 'text.secondary',
+                            '&:hover': { color: 'text.primary' },
                           }}
                         >
-                          {active && <CheckRoundedIcon sx={{ fontSize: 18 }} />}
+                          <CloseRoundedIcon sx={{ fontSize: 14 }} />
                         </Box>
-                      </Tooltip>
-                    )
-                  })}
-                </Box>
-                <Box sx={{ minHeight: 22, mt: 1 }}>
-                  <AnimatePresence>
-                    {colors.length > 0 && (
-                      <Stack
-                        component={motion.div}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        direction="row"
-                        alignItems="center"
-                        spacing={0.5}
-                      >
-                        {autoDetected && (
-                          <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
-                        )}
-                        <Typography variant="caption" color="text.secondary">
-                          {autoDetected ? 'Detected from photo — tap to adjust · ' : ''}
-                          Dominant: <b>{getColor(colors[0]).name}</b>
-                        </Typography>
-                      </Stack>
-                    )}
-                  </AnimatePresence>
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    Upload a photo to detect colours automatically
+                    {canEyedrop ? ', or use the eyedropper to pick one' : ''}.
+                  </Typography>
+                )}
+                <Box sx={{ minHeight: 20, mt: 1 }}>
+                  {autoDetected && colors.length > 0 && (
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      <AutoAwesomeRoundedIcon sx={{ fontSize: 14, color: 'primary.main' }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Auto-detected from your photo — remove any, or add more with the eyedropper.
+                      </Typography>
+                    </Stack>
+                  )}
                 </Box>
               </Box>
 

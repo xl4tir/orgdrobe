@@ -47,7 +47,7 @@ export function SidebarNav() {
           color="text.secondary"
           sx={{ display: 'block', textAlign: 'center', mt: 2 }}
         >
-          OrgDrobe · v0.1
+          Роздягальня · v0.1
         </Typography>
       </Box>
     </Box>

@@ -46,8 +46,49 @@ export const colorMap: Record<string, GarmentColor> = Object.fromEntries(
   COLORS.map((c) => [c.id, c]),
 )
 
-export const getColor = (id: string): GarmentColor =>
-  colorMap[id] ?? { id, name: id, hex: '#9E9E9E', group: 'gray' }
+/** Classify an arbitrary hex into one of our colour groups (for stats/palette). */
+export function classifyGroup(hex: string): ColorGroup {
+  const clean = hex.replace('#', '')
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean
+  const num = parseInt(full, 16)
+  const r = ((num >> 16) & 255) / 255
+  const g = ((num >> 8) & 255) / 255
+  const b = (num & 255) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+  const d = max - min
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1))
+
+  if (l > 0.82 && s < 0.2) return 'white'
+  if (l < 0.16) return 'dark'
+  if (s < 0.12) return 'gray'
+
+  let h = 0
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6
+    else if (max === g) h = (b - r) / d + 2
+    else h = (r - g) / d + 4
+    h *= 60
+    if (h < 0) h += 360
+  }
+  if (h >= 75 && h < 165) return 'green'
+  if (h >= 165 && h < 265) return 'cool'
+  return 'warm'
+}
+
+/**
+ * Resolve a colour reference. Accepts a catalogue id (e.g. "sage") OR any raw
+ * hex string (e.g. "#3E5C82", from the eyedropper / photo detection).
+ */
+export const getColor = (id: string): GarmentColor => {
+  if (colorMap[id]) return colorMap[id]
+  if (/^#?[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(id)) {
+    const hex = id.startsWith('#') ? id : `#${id}`
+    return { id: hex, name: hex.toUpperCase(), hex, group: classifyGroup(hex) }
+  }
+  return { id, name: id, hex: '#9E9E9E', group: 'gray' }
+}
 
 export const GROUP_LABELS: Record<ColorGroup, string> = {
   green: 'Greens',

@@ -13,7 +13,7 @@ function usePageTitle(): string {
   const match = [...NAV_ITEMS]
     .sort((a, b) => b.to.length - a.to.length)
     .find((i) => pathname === i.to || pathname.startsWith(i.to + '/'))
-  return match?.label ?? 'OrgDrobe'
+  return match?.label ?? 'Роздягальня'
 }
 
 export function Header({ onOpenMenu }: { onOpenMenu: () => void }) {

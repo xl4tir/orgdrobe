@@ -1,38 +1,23 @@
-import { COLORS } from './colors'
-import { hexToRgb } from './colorUtils'
+import { hexToRgb, rgbToHex } from './colorUtils'
 
-const catalogRgb = COLORS.map((c) => ({ id: c.id, ...hexToRgb(c.hex) }))
+/** Whether the native EyeDropper API is available (Chromium browsers). */
+export const eyedropperSupported = (): boolean =>
+  typeof window !== 'undefined' && 'EyeDropper' in window
 
-/** Nearest catalogue colour id to an arbitrary rgb triple (squared distance). */
-function nearestFromRgb(r: number, g: number, b: number): string {
-  let bestId = catalogRgb[0].id
-  let bestD = Infinity
-  for (const c of catalogRgb) {
-    const d = (c.r - r) ** 2 + (c.g - g) ** 2 + (c.b - b) ** 2
-    if (d < bestD) {
-      bestD = d
-      bestId = c.id
-    }
-  }
-  return bestId
-}
-
-/** Map a hex colour (e.g. from the eyedropper) to the closest catalogue colour id. */
-export function nearestColorId(hex: string): string {
-  const { r, g, b } = hexToRgb(hex)
-  return nearestFromRgb(r, g, b)
-}
+const dist2 = (a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }) =>
+  (a.r - b.r) ** 2 + (a.g - b.g) ** 2 + (a.b - b.b) ** 2
 
 /**
- * Analyse an uploaded image (data URL) and return the most prominent catalogue
- * colours, ranked by area. Every pixel is snapped to its nearest catalogue
- * colour and tallied, so the result is always valid palette ids.
+ * Analyse an uploaded image (data URL) and return its most prominent colours as
+ * real hex values — millions possible, not snapped to any preset palette.
+ * Samples the central region (to favour the garment over the background),
+ * buckets similar colours, and returns the top `count` distinct averages.
  */
-export function detectCatalogColors(src: string, count = 3): Promise<string[]> {
+export function detectDominantColors(src: string, count = 3): Promise<string[]> {
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () => {
-      const size = 56
+      const size = 64
       const canvas = document.createElement('canvas')
       canvas.width = size
       canvas.height = size
@@ -44,24 +29,50 @@ export function detectCatalogColors(src: string, count = 3): Promise<string[]> {
       try {
         data = ctx.getImageData(0, 0, size, size).data
       } catch {
-        return resolve([]) // canvas tainted (remote image) — skip silently
+        return resolve([]) // tainted canvas
       }
 
-      const tally = new Map<string, number>()
-      for (let i = 0; i < data.length; i += 4) {
-        if (data[i + 3] < 125) continue // skip transparent
-        const id = nearestFromRgb(data[i], data[i + 1], data[i + 2])
-        tally.set(id, (tally.get(id) ?? 0) + 1)
+      // Bucket by coarse quantisation, tracking the running average of each bucket.
+      const buckets = new Map<string, { r: number; g: number; b: number; n: number }>()
+      const lo = Math.round(size * 0.15)
+      const hi = Math.round(size * 0.85)
+      for (let y = lo; y < hi; y++) {
+        for (let x = lo; x < hi; x++) {
+          const i = (y * size + x) * 4
+          if (data[i + 3] < 125) continue
+          const r = data[i]
+          const g = data[i + 1]
+          const b = data[i + 2]
+          const key = `${r >> 5}-${g >> 5}-${b >> 5}` // 8 levels/channel
+          const e = buckets.get(key)
+          if (e) {
+            e.r += r
+            e.g += g
+            e.b += b
+            e.n += 1
+          } else {
+            buckets.set(key, { r, g, b, n: 1 })
+          }
+        }
       }
 
-      const ranked = [...tally.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0])
-      resolve(ranked.slice(0, count))
+      const ranked = [...buckets.values()]
+        .map((e) => ({ r: e.r / e.n, g: e.g / e.n, b: e.b / e.n, n: e.n }))
+        .sort((a, b) => b.n - a.n)
+
+      // Greedily keep the most common colours that are visually distinct.
+      const picked: { r: number; g: number; b: number }[] = []
+      for (const c of ranked) {
+        if (picked.every((p) => dist2(p, c) > 900)) picked.push(c)
+        if (picked.length >= count) break
+      }
+
+      resolve(picked.map((c) => rgbToHex({ r: c.r, g: c.g, b: c.b })))
     }
     img.onerror = () => resolve([])
     img.src = src
   })
 }
 
-/** Whether the native EyeDropper API is available (Chromium browsers). */
-export const eyedropperSupported = (): boolean =>
-  typeof window !== 'undefined' && 'EyeDropper' in window
+/** Normalise an eyedropper result to a #rrggbb string. */
+export const normalizeHex = (hex: string): string => rgbToHex(hexToRgb(hex))

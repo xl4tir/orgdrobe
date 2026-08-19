@@ -132,7 +132,7 @@ export function LandingPage() {
                 Wear <GradientText>everything</GradientText> you own.
               </Typography>
               <Typography component={motion.p} variants={riseItem} variant="h6" sx={{ fontWeight: 400, color: 'text.secondary', mb: 4, maxWidth: 480 }}>
-                OrgDrobe catalogues your clothes, helps you craft outfits you’ll actually wear, and surfaces the pieces you forgot you had.
+                Роздягальня catalogues your clothes, helps you craft outfits you’ll actually wear, and surfaces the pieces you forgot you had.
               </Typography>
               <Stack component={motion.div} variants={riseItem} direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Button variant="contained" size="large" endIcon={<EastRoundedIcon />} onClick={() => navigate(isAuthenticated ? '/app' : '/register')}>
@@ -246,7 +246,7 @@ export function LandingPage() {
               Ready to meet your wardrobe?
             </Typography>
             <Typography sx={{ opacity: 0.9, maxWidth: 520, mx: 'auto', mb: 4, fontSize: '1.1rem' }}>
-              It’s free to start. Add a few pieces and watch OrgDrobe do the rest.
+              It’s free to start. Add a few pieces and watch Роздягальня do the rest.
             </Typography>
             <Button
               size="large"
@@ -266,7 +266,7 @@ export function LandingPage() {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems="center">
             <Logo size={28} />
             <Typography variant="body2" color="text.secondary">
-              © 2026 OrgDrobe · Made for people who love their clothes.
+              © 2026 Роздягальня · Made for people who love their clothes.
             </Typography>
           </Stack>
         </Container>
