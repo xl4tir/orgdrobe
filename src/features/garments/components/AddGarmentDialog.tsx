@@ -10,8 +10,9 @@ import {
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import AddRoundedIcon from '@mui/icons-material/AddRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import CloudUploadRoundedIcon from '@mui/icons-material/CloudUploadRounded'
@@ -19,7 +20,7 @@ import PhotoCameraRoundedIcon from '@mui/icons-material/PhotoCameraRounded'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import ColorizeRoundedIcon from '@mui/icons-material/ColorizeRounded'
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { GarmentVisual } from '@/components/ui/GarmentVisual'
 import { getColor } from '@/lib/colors'
 import { detectDominantColors, normalizeHex, eyedropperSupported } from '@/lib/imageColor'
@@ -53,6 +54,8 @@ const toggleValue = <T,>(arr: T[], value: T): T[] =>
 export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
   const navigate = useNavigate()
   const addGarment = useGarmentStore((s) => s.addGarment)
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -169,9 +172,18 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      slotProps={{ paper: { sx: { borderRadius: 5, overflow: 'hidden' } } }}
+      fullScreen={fullScreen}
+      slotProps={{ paper: { sx: { borderRadius: { xs: 0, sm: 5 }, overflow: 'hidden' } } }}
     >
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          height: fullScreen ? '100%' : 'auto',
+          overflowY: fullScreen ? 'auto' : 'visible',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         {/* ---- Left: live preview + photo upload on a calm neutral surface ---- */}
         <Box
           sx={{
@@ -216,47 +228,81 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
               position: 'relative',
               width: '100%',
               maxWidth: 240,
-              p: 0.75,
-              borderRadius: 3,
+              aspectRatio: '3 / 4',
+              borderRadius: 4,
+              overflow: 'hidden',
               cursor: 'pointer',
-              border: '2px dashed',
+              display: 'grid',
+              placeItems: 'center',
+              border: hasImage ? '1px solid' : '2px dashed',
               borderColor: dragOver
                 ? 'primary.main'
                 : hasImage
+                  ? 'divider'
+                  : (t) => alpha(t.palette.primary.main, 0.35),
+              bgcolor: (t) =>
+                hasImage
                   ? 'transparent'
-                  : 'divider',
-              bgcolor: (t) => (dragOver ? alpha(t.palette.primary.main, 0.06) : 'transparent'),
+                  : dragOver
+                    ? alpha(t.palette.primary.main, 0.08)
+                    : t.palette.mode === 'light'
+                      ? alpha(t.palette.primary.main, 0.04)
+                      : alpha('#ffffff', 0.03),
               transition: 'border-color .18s ease, background-color .18s ease',
-              '&:hover': { borderColor: hasImage ? 'divider' : 'primary.light' },
-              '&:hover .dropzone-hint': { opacity: 1 },
+              '&:hover': { borderColor: 'primary.main' },
               '&:focus-visible': {
                 outline: (t) => `2px solid ${t.palette.primary.main}`,
                 outlineOffset: 2,
               },
             }}
           >
-            <AnimatePresence mode="wait" initial={false}>
+            {hasImage ? (
               <Box
-                key={hasImage ? 'photo' : 'silhouette'}
                 component={motion.div}
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.25, ease: 'easeOut' }}
+                sx={{ position: 'absolute', inset: 0 }}
               >
-                <GarmentVisual garment={previewGarment} ratio="3 / 4" radius={18} />
+                <GarmentVisual garment={previewGarment} ratio="3 / 4" radius={0} sx={{ height: '100%' }} />
               </Box>
-            </AnimatePresence>
+            ) : (
+              <Stack
+                alignItems="center"
+                spacing={1.25}
+                sx={{ px: 2, textAlign: 'center', pointerEvents: 'none', color: 'text.secondary' }}
+              >
+                <Box
+                  sx={{
+                    width: 54,
+                    height: 54,
+                    borderRadius: '50%',
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: 'primary.main',
+                    bgcolor: (t) => alpha(t.palette.primary.main, 0.1),
+                  }}
+                >
+                  <CloudUploadRoundedIcon />
+                </Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                  {dragOver ? 'Drop to upload' : 'Upload a photo'}
+                </Typography>
+                <Typography variant="caption">
+                  or drag &amp; drop — we’ll remove the background for you
+                </Typography>
+              </Stack>
+            )}
 
             {processing && (
               <Box
                 sx={{
                   position: 'absolute',
-                  inset: 6,
-                  borderRadius: '18px',
+                  inset: 0,
                   display: 'grid',
                   placeItems: 'center',
                   bgcolor: (t) =>
-                    t.palette.mode === 'light' ? 'rgba(255,255,255,0.62)' : 'rgba(20,17,25,0.6)',
+                    t.palette.mode === 'light' ? 'rgba(255,255,255,0.66)' : 'rgba(20,17,25,0.62)',
                   backdropFilter: 'blur(2px)',
                   zIndex: 2,
                 }}
@@ -269,37 +315,10 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
                 </Stack>
               </Box>
             )}
-
-            {/* hover / drag hint (only while there is no photo) */}
-            {!hasImage && (
-              <Box
-                className="dropzone-hint"
-                aria-hidden
-                sx={{
-                  position: 'absolute',
-                  inset: 6,
-                  borderRadius: '18px',
-                  display: 'grid',
-                  placeItems: 'center',
-                  color: '#fff',
-                  bgcolor: 'rgba(15,12,20,0.32)',
-                  opacity: dragOver ? 1 : 0,
-                  transition: 'opacity .18s ease',
-                  pointerEvents: 'none',
-                }}
-              >
-                <Stack alignItems="center" spacing={0.75}>
-                  <CloudUploadRoundedIcon />
-                  <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                    {dragOver ? 'Drop to upload' : 'Upload photo'}
-                  </Typography>
-                </Stack>
-              </Box>
-            )}
           </Box>
 
           {/* controls */}
-          {hasImage ? (
+          {hasImage && (
             <Stack direction="row" spacing={1}>
               <Button
                 size="small"
@@ -319,20 +338,6 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
                 Remove
               </Button>
             </Stack>
-          ) : (
-            <Stack alignItems="center" spacing={0.5}>
-              <Button
-                variant="outlined"
-                color="inherit"
-                startIcon={<CloudUploadRoundedIcon />}
-                onClick={openFilePicker}
-              >
-                Upload photo
-              </Button>
-              <Typography variant="caption" color="text.secondary">
-                or drag &amp; drop an image
-              </Typography>
-            </Stack>
           )}
 
           <input
@@ -347,7 +352,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
         {/* ---- Right: the form ---- */}
         <Box
           sx={{
-            flex: 1,
+            flex: { xs: '0 0 auto', md: 1 },
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
@@ -373,7 +378,7 @@ export function AddGarmentDialog({ open, onClose }: AddGarmentDialogProps) {
             </IconButton>
           </Stack>
 
-          <Box sx={{ px: { xs: 3, md: 4 }, pt: 2, pb: 2, overflowY: 'auto', flex: 1 }}>
+          <Box sx={{ px: { xs: 3, md: 4 }, pt: 2, pb: 2, overflowY: { xs: 'visible', md: 'auto' }, flex: 1 }}>
             <Stack spacing={3}>
               <TextField
                 label="Name"
