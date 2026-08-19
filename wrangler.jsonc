@@ -1,0 +1,10 @@
+{
+  // Static-assets deployment for Cloudflare Workers (used by `npx wrangler deploy`).
+  "name": "orgdrobe",
+  "compatibility_date": "2024-11-01",
+  "assets": {
+    "directory": "./dist",
+    // Serve index.html for any unmatched route so client-side routing works.
+    "not_found_handling": "single-page-application"
+  }
+}
