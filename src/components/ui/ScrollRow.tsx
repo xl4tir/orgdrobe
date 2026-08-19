@@ -30,7 +30,7 @@ export function ScrollRow({ children, itemWidth = 210 }: ScrollRowProps) {
     d.lastX = e.clientX
     d.lastT = performance.now()
     d.v = 0
-    el.setPointerCapture?.(e.pointerId)
+    // NB: no setPointerCapture — it swallows child click events in Chromium.
     el.style.scrollSnapType = 'none'
     el.style.scrollBehavior = 'auto'
     el.style.cursor = 'grabbing'
@@ -42,7 +42,7 @@ export function ScrollRow({ children, itemWidth = 210 }: ScrollRowProps) {
     const el = ref.current
     if (!d.down || !el) return
     const dx = e.clientX - d.startX
-    if (Math.abs(dx) > 4) d.moved = true
+    if (Math.abs(dx) > 8) d.moved = true
     el.scrollLeft = d.startScroll - dx
     const now = performance.now()
     const dt = now - d.lastT || 16
