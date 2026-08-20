@@ -109,9 +109,31 @@ export const getEditorialComponents = (): Components<Omit<Theme, 'components'>> 
   MuiChip: {
     styleOverrides: {
       root: { borderRadius: radii.pill, fontWeight: 600 },
-      filled: ({ theme }) => ({
-        backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[100] : 'rgba(255,255,255,0.06)',
-      }),
+      // The `filled` slot applies to *every* filled chip, so we must handle both
+      // cases explicitly. Neutral (color="default") chips get a soft grey wash.
+      // Coloured chips (primary/secondary/…) must be given their solid palette
+      // background here *positively* — MUI's own filled-colour background does
+      // not survive for clickable chips once this slot is overridden, which left
+      // selected filter/category chips as white-on-transparent (invisible).
+      filled: ({ theme, ownerState }) => {
+        if (!ownerState.color || ownerState.color === 'default') {
+          return {
+            backgroundColor:
+              theme.palette.mode === 'light' ? theme.palette.grey[100] : 'rgba(255,255,255,0.06)',
+          }
+        }
+        const pal = theme.palette[ownerState.color as 'primary']
+        // getContrastText picks white *or* dark ink per the actual background —
+        // e.g. white on iris, but dark on the lighter coral secondary — so the
+        // label always meets contrast. Hover darkens via brightness (not a
+        // darker bg colour) to keep that text/background relationship intact.
+        return {
+          backgroundColor: pal.main,
+          color: theme.palette.getContrastText(pal.main),
+          '&:hover': { backgroundColor: pal.main, filter: 'brightness(0.93)' },
+          '&.Mui-focusVisible': { backgroundColor: pal.main, filter: 'brightness(0.9)' },
+        }
+      },
       outlined: { borderWidth: 1.5 },
     },
   },

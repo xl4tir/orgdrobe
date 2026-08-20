@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Avatar,
@@ -31,6 +31,36 @@ import { useWeatherStore } from '@/features/dashboard/weatherStore'
 import { LocationPicker } from '@/features/dashboard/components/LocationPicker'
 import { initials } from '@/lib/format'
 
+/**
+ * Read an image file and return a small, square-ish JPEG data URL. Downscaling
+ * keeps the avatar well under the localStorage quota (a raw phone photo can be
+ * several MB) while staying crisp at the sizes we render it.
+ */
+function fileToAvatarDataUrl(file: File, max = 256): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('Could not read file'))
+    reader.onload = () => {
+      const img = new Image()
+      img.onerror = () => reject(new Error('Could not load image'))
+      img.onload = () => {
+        const scale = Math.min(1, max / Math.max(img.width, img.height))
+        const w = Math.max(1, Math.round(img.width * scale))
+        const h = Math.max(1, Math.round(img.height * scale))
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return reject(new Error('Canvas unavailable'))
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL('image/jpeg', 0.85))
+      }
+      img.src = reader.result as string
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 function SettingsCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
     <Card sx={{ p: { xs: 2.5, sm: 3 } }}>
@@ -59,9 +89,36 @@ export function SettingsPage() {
   const [repeatPassword, setRepeatPassword] = useState('')
   const [snack, setSnack] = useState<string | null>(null)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const avatar = user?.avatar
+
   const save = () => {
     updateUser({ name, email })
     setSnack('Settings saved')
+  }
+
+  const onPickPhoto = () => fileInputRef.current?.click()
+
+  const onPhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file later
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setSnack('Please choose an image file')
+      return
+    }
+    try {
+      const dataUrl = await fileToAvatarDataUrl(file)
+      updateUser({ avatar: dataUrl })
+      setSnack('Profile photo updated')
+    } catch {
+      setSnack('Sorry — that image could not be processed')
+    }
+  }
+
+  const removePhoto = () => {
+    updateUser({ avatar: undefined })
+    setSnack('Profile photo removed')
   }
 
   const updatePassword = () => {
@@ -87,25 +144,34 @@ export function SettingsPage() {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems={{ xs: 'stretch', sm: 'center' }}>
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar
+                src={avatar}
                 sx={{ width: 76, height: 76, fontSize: '1.6rem', fontWeight: 700, bgcolor: 'primary.main' }}
               >
                 {initials(name || 'U')}
               </Avatar>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={onPhotoSelected}
+              />
               <Stack spacing={1}>
                 <Button
                   size="small"
                   variant="outlined"
                   color="inherit"
                   startIcon={<PhotoCameraRoundedIcon />}
-                  onClick={() => setSnack('Avatar upload is coming soon')}
+                  onClick={onPickPhoto}
                 >
-                  Change
+                  {avatar ? 'Change' : 'Upload'}
                 </Button>
                 <Button
                   size="small"
                   color="error"
                   startIcon={<DeleteOutlineRoundedIcon />}
-                  onClick={() => setSnack('Avatar removed')}
+                  onClick={removePhoto}
+                  disabled={!avatar}
                 >
                   Remove
                 </Button>

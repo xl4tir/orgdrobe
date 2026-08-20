@@ -31,6 +31,7 @@ export function UserMenu() {
     <>
       <IconButton onClick={open} sx={{ p: 0.5 }} aria-label="Account menu">
         <Avatar
+          src={user?.avatar}
           sx={{
             width: 36,
             height: 36,

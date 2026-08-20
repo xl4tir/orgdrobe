@@ -5,6 +5,8 @@ export interface User {
   name: string
   email: string
   handle: string
+  /** Optional profile photo, stored as a small data URL. */
+  avatar?: string
 }
 
 interface AuthState {
