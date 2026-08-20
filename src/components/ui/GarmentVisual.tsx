@@ -39,9 +39,9 @@ export function GarmentVisual({
   const [imgOk, setImgOk] = useState(Boolean(garment.image))
   useEffect(() => setImgOk(Boolean(garment.image)), [garment.image])
   const showPhoto = Boolean(garment.image) && imgOk
-  // Uploaded, background-removed cutouts are transparent PNGs (data URLs) — show
-  // the whole garment with breathing room; remote demo photos fill the frame.
-  const isCutout = garment.image?.startsWith('data:') ?? false
+  // Every garment image is a transparent product cut-out (a single item on a
+  // clear background) — show the whole piece on its colour-matched card.
+  const isCutout = Boolean(garment.image)
 
   // Material: a flat, solid wash of the garment's own colour — pale in light mode, deep in dark.
   const materialBg = isLight ? mix(primary, '#ffffff', 0.82) : mix(primary, '#211F26', 0.7)

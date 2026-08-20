@@ -1,21 +1,21 @@
 import type { FeedEvent, Garment, Outfit, Weather } from '@/types/domain'
+import { daysAgo } from './mockData.dates'
+import { GARMENTS_A } from './garments/partA'
+import { GARMENTS_B } from './garments/partB'
+import { GARMENTS_C } from './garments/partC'
+import { GARMENTS_D } from './garments/partD'
 
 /**
  * Deterministic demo dataset. Dates are expressed as day-offsets from "now" and
  * resolved once at module load, so the feed always reads as recent activity.
+ * The base garments live here; ~68 more are split across part files (built in
+ * parallel) and concatenated into MOCK_GARMENTS below.
  */
-const now = new Date('2026-08-18T16:40:00')
-const daysAgo = (d: number, h = 0, m = 0) => {
-  const date = new Date(now)
-  date.setDate(date.getDate() - d)
-  date.setHours(h, m, 0, 0)
-  return date.toISOString()
-}
 
-export const MOCK_GARMENTS: Garment[] = [
+const BASE_GARMENTS: Garment[] = [
   {
     id: 'g-linen-shirt',
-    image: 'https://loremflickr.com/600/800/shirt?lock=1',
+    image: 'https://pngimg.com/uploads/tshirt/tshirt_PNG5433.png',
     name: 'Relaxed Linen Shirt',
     description: 'Breezy oversized linen shirt with a soft collar. The summer workhorse.',
     category: 'tops',
@@ -30,7 +30,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-charcoal-tee',
-    image: 'https://loremflickr.com/600/800/tshirt?lock=2',
+    image: 'https://pngimg.com/uploads/tshirt/tshirt_PNG5425.png',
     name: 'Heavyweight Boxy Tee',
     description: 'Structured cotton tee that holds its shape. Everyday base layer.',
     category: 'tops',
@@ -45,7 +45,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-sage-knit',
-    image: 'https://loremflickr.com/600/800/sweater?lock=3',
+    image: 'https://pngimg.com/uploads/sweater/sweater_PNG5.png',
     name: 'Merino Crewneck',
     description: 'Fine-gauge merino in a muted sage. Layers under everything.',
     category: 'tops',
@@ -60,7 +60,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-denim-wide',
-    image: 'https://loremflickr.com/600/800/jeans?lock=4',
+    image: 'https://pngimg.com/uploads/jeans/jeans_PNG5745.png',
     name: 'Wide-Leg Selvedge Denim',
     description: 'Rigid selvedge denim with a high rise and a generous leg.',
     category: 'bottoms',
@@ -75,7 +75,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-pleated-trouser',
-    image: 'https://loremflickr.com/600/800/trousers?lock=5',
+    image: 'https://pngimg.com/uploads/jeans/jeans_PNG5750.png',
     name: 'Pleated Wool Trousers',
     description: 'Tailored pleats with a fluid drape. Dresses any top up instantly.',
     category: 'bottoms',
@@ -90,7 +90,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-linen-short',
-    image: 'https://loremflickr.com/600/800/trousers?lock=6',
+    image: 'https://pngimg.com/uploads/leggings/leggings_PNG10.png',
     name: 'Pull-On Linen Shorts',
     description: 'Elastic-waist linen shorts. The reason summer is bearable.',
     category: 'bottoms',
@@ -104,7 +104,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-trench',
-    image: 'https://loremflickr.com/600/800/jacket?lock=7',
+    image: 'https://pngimg.com/uploads/coat/coat_PNG5.png',
     name: 'Cotton Trench Coat',
     description: 'Classic belted trench in warm camel. Rain-ready and forever chic.',
     category: 'outerwear',
@@ -119,7 +119,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-quilted-jacket',
-    image: 'https://loremflickr.com/600/800/jacket?lock=8',
+    image: 'https://pngimg.com/uploads/jacket/jacket_PNG8025.png',
     name: 'Quilted Field Jacket',
     description: 'Diamond-quilted jacket in deep forest. Weekend armour.',
     category: 'outerwear',
@@ -133,7 +133,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-slip-dress',
-    image: 'https://loremflickr.com/600/800/fashion?lock=9',
+    image: 'https://pngimg.com/uploads/dress/dress_PNG100.png',
     name: 'Bias-Cut Slip Dress',
     description: 'Liquid satin slip in burgundy. From desk to dinner.',
     category: 'dresses',
@@ -148,7 +148,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-linen-dress',
-    image: 'https://loremflickr.com/600/800/fashion?lock=10',
+    image: 'https://pngimg.com/uploads/dress/dress_PNG105.png',
     name: 'Tiered Linen Midi',
     description: 'Airy tiered midi in ivory. The one-and-done heatwave dress.',
     category: 'dresses',
@@ -162,7 +162,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-white-sneaker',
-    image: 'https://loremflickr.com/600/800/sneakers?lock=11',
+    image: 'https://pngimg.com/uploads/running_shoes/running_shoes_PNG5780.png',
     name: 'Minimal Leather Sneakers',
     description: 'Clean off-white trainers that quietly go with everything.',
     category: 'footwear',
@@ -177,7 +177,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-chelsea-boot',
-    image: 'https://loremflickr.com/600/800/boots-shoes?lock=12',
+    image: 'https://pngimg.com/uploads/boots/boots_PNG7779.png',
     name: 'Suede Chelsea Boots',
     description: 'Rust suede boots with a stacked heel. Autumn’s default.',
     category: 'footwear',
@@ -191,7 +191,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-canvas-tote',
-    image: 'https://loremflickr.com/600/800/tote?lock=13',
+    image: 'https://pngimg.com/uploads/backpack/backpack_PNG6310.png',
     name: 'Structured Canvas Tote',
     description: 'Roomy waxed-canvas tote in stone. Carries the whole day.',
     category: 'accessories',
@@ -205,7 +205,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-silk-scarf',
-    image: 'https://loremflickr.com/600/800/fashion?lock=33',
+    image: 'https://pngimg.com/uploads/scarf/scarf_PNG5.png',
     name: 'Printed Silk Scarf',
     description: 'Hand-rolled silk scarf in lilac. Instant outfit upgrade.',
     category: 'accessories',
@@ -219,7 +219,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-wool-coat',
-    image: 'https://loremflickr.com/600/800/outerwear?lock=15',
+    image: 'https://pngimg.com/uploads/coat/coat_PNG12.png',
     name: 'Double-Faced Wool Coat',
     description: 'Longline wool coat in charcoal. The winter statement piece.',
     category: 'outerwear',
@@ -234,7 +234,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-cardigan',
-    image: 'https://loremflickr.com/600/800/sweater?lock=16',
+    image: 'https://pngimg.com/uploads/sweater/sweater_PNG12.png',
     name: 'Chunky Ribbed Cardigan',
     description: 'Oversized ribbed cardigan in cream. Sunday morning uniform.',
     category: 'tops',
@@ -248,7 +248,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-striped-breton',
-    image: 'https://loremflickr.com/600/800/tshirt?lock=17',
+    image: 'https://pngimg.com/uploads/tshirt/tshirt_PNG5440.png',
     name: 'Breton Striped Top',
     description: 'Classic navy-and-cream Breton stripe. Never not right.',
     category: 'tops',
@@ -263,7 +263,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-mustard-turtleneck',
-    image: 'https://loremflickr.com/600/800/sweater?lock=18',
+    image: 'https://pngimg.com/uploads/sweater/sweater_PNG20.png',
     name: 'Ribbed Mustard Turtleneck',
     description: 'Snug ribbed turtleneck in warm mustard. Brightens grey days.',
     category: 'tops',
@@ -278,7 +278,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-teal-blouse',
-    image: 'https://loremflickr.com/600/800/shirt?lock=19',
+    image: 'https://pngimg.com/uploads/tshirt/tshirt_PNG5428.png',
     name: 'Silk Wrap Blouse',
     description: 'Fluid wrap blouse in deep teal. Quietly dressy.',
     category: 'tops',
@@ -293,7 +293,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-cargo-pants',
-    image: 'https://loremflickr.com/600/800/trousers?lock=20',
+    image: 'https://pngimg.com/uploads/jeans/jeans_PNG5755.png',
     name: 'Relaxed Cargo Pants',
     description: 'Slouchy olive cargos with roomy pockets. Off-duty ease.',
     category: 'bottoms',
@@ -308,7 +308,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-cobalt-skirt',
-    image: 'https://loremflickr.com/600/800/skirt?lock=21',
+    image: 'https://pngimg.com/uploads/leggings/leggings_PNG14.png',
     name: 'Pleated Midi Skirt',
     description: 'Sunray-pleated midi in vivid cobalt. Swishes beautifully.',
     category: 'bottoms',
@@ -323,7 +323,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-cream-chino',
-    image: 'https://loremflickr.com/600/800/trousers?lock=22',
+    image: 'https://pngimg.com/uploads/jeans/jeans_PNG5760.png',
     name: 'Straight-Leg Chinos',
     description: 'Crisp cream chinos with a clean break. Smart-casual anchor.',
     category: 'bottoms',
@@ -338,7 +338,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-teal-blazer',
-    image: 'https://loremflickr.com/600/800/blazer?lock=23',
+    image: 'https://pngimg.com/uploads/suit/suit_PNG8118.png',
     name: 'Relaxed Teal Blazer',
     description: 'Soft-shouldered blazer in muted teal. Throws over anything.',
     category: 'outerwear',
@@ -353,7 +353,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-denim-jacket',
-    image: 'https://loremflickr.com/600/800/jacket?lock=24',
+    image: 'https://pngimg.com/uploads/jacket/jacket_PNG8030.png',
     name: 'Washed Denim Jacket',
     description: 'Lived-in trucker jacket in mid denim. Layers over everything.',
     category: 'outerwear',
@@ -368,7 +368,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-puffer-vest',
-    image: 'https://loremflickr.com/600/800/outerwear?lock=25',
+    image: 'https://pngimg.com/uploads/jacket/jacket_PNG8035.png',
     name: 'Cropped Puffer Vest',
     description: 'Lightweight quilted vest in plum. Extra warmth, no bulk.',
     category: 'outerwear',
@@ -383,7 +383,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-shirt-dress',
-    image: 'https://loremflickr.com/600/800/fashion?lock=26',
+    image: 'https://pngimg.com/uploads/dress/dress_PNG110.png',
     name: 'Poplin Shirt Dress',
     description: 'Crisp belted shirt dress in sky blue. Effortless all-day.',
     category: 'dresses',
@@ -398,7 +398,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-emerald-wrap-dress',
-    image: 'https://loremflickr.com/600/800/fashion?lock=27',
+    image: 'https://pngimg.com/uploads/dress/dress_PNG115.png',
     name: 'Emerald Wrap Dress',
     description: 'Jersey wrap dress in rich emerald. Flatters and travels well.',
     category: 'dresses',
@@ -413,7 +413,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-ankle-boot',
-    image: 'https://loremflickr.com/600/800/boots-shoes?lock=28',
+    image: 'https://pngimg.com/uploads/boots/boots_PNG7785.png',
     name: 'Black Leather Ankle Boots',
     description: 'Sleek pointed ankle boots in black. Dress or denim, done.',
     category: 'footwear',
@@ -428,7 +428,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-tan-loafer',
-    image: 'https://loremflickr.com/600/800/shoes?lock=29',
+    image: 'https://pngimg.com/uploads/slippers/slippers_PNG10.png',
     name: 'Tan Leather Loafers',
     description: 'Polished penny loafers in warm chocolate tan. Smart and comfy.',
     category: 'footwear',
@@ -443,7 +443,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-raffia-sandal',
-    image: 'https://loremflickr.com/600/800/footwear?lock=30',
+    image: 'https://pngimg.com/uploads/sandals/sandals_PNG9671.png',
     name: 'Raffia Flat Sandals',
     description: 'Woven raffia slides in natural peach. Barefoot-easy summer.',
     category: 'footwear',
@@ -457,7 +457,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-leather-belt',
-    image: 'https://loremflickr.com/600/800/fashion?lock=31',
+    image: 'https://pngimg.com/uploads/belt/belt_PNG9564.png',
     name: 'Woven Leather Belt',
     description: 'Braided leather belt in cognac chocolate. Cinches everything.',
     category: 'accessories',
@@ -471,7 +471,7 @@ export const MOCK_GARMENTS: Garment[] = [
   },
   {
     id: 'g-wool-beanie',
-    image: 'https://loremflickr.com/600/800/fashion?lock=32',
+    image: 'https://pngimg.com/uploads/hat/hat_PNG5689.png',
     name: 'Ribbed Wool Beanie',
     description: 'Chunky ribbed beanie in cherry red. A pop against grey coats.',
     category: 'accessories',
@@ -484,6 +484,15 @@ export const MOCK_GARMENTS: Garment[] = [
     createdAt: daysAgo(50),
     favorite: true,
   },
+]
+
+/** All demo garments: the base set plus the parallel-built part files (~100 total). */
+export const MOCK_GARMENTS: Garment[] = [
+  ...BASE_GARMENTS,
+  ...GARMENTS_A,
+  ...GARMENTS_B,
+  ...GARMENTS_C,
+  ...GARMENTS_D,
 ]
 
 export const MOCK_OUTFITS: Outfit[] = [
@@ -607,6 +616,102 @@ export const MOCK_OUTFITS: Outfit[] = [
     createdAt: daysAgo(38),
     favorite: false,
   },
+  {
+    id: 'o-cotton-crew-denim',
+    name: 'Clean Cotton Casual',
+    description: 'A soft v-neck, slim dark denim and white leather sneakers. The daily default.',
+    garmentIds: ['g-a01', 'g-b01', 'g-c10', 'g-d01'],
+    layout: 'grid',
+    seasons: ['spring', 'summer'],
+    timesWorn: 12,
+    lastWorn: daysAgo(1, 9, 20),
+    createdAt: daysAgo(24),
+    favorite: true,
+  },
+  {
+    id: 'o-aran-parka',
+    name: 'Snow-Day Aran',
+    description: 'Chunky cable knit under a hooded parka, beanie and boots. Built for the cold.',
+    garmentIds: ['g-a11', 'g-b02', 'g-c04', 'g-d05', 'g-c13'],
+    layout: 'canvas',
+    seasons: ['winter'],
+    timesWorn: 5,
+    lastWorn: daysAgo(12, 8, 30),
+    createdAt: daysAgo(46),
+    favorite: false,
+  },
+  {
+    id: 'o-polo-linen-blazer',
+    name: 'Smart Linen',
+    description: 'Piqué polo, wide ponte trousers and a linen blazer over suede loafers.',
+    garmentIds: ['g-a09', 'g-b10', 'g-c09', 'g-c17'],
+    layout: 'cover',
+    seasons: ['spring', 'summer'],
+    timesWorn: 4,
+    lastWorn: daysAgo(5, 11, 0),
+    createdAt: daysAgo(29),
+    favorite: false,
+  },
+  {
+    id: 'o-lbd-biker',
+    name: 'LBD After Dark',
+    description: 'Little black dress, leather biker and ankle boots. Zero hesitation.',
+    garmentIds: ['g-b16', 'g-c07', 'g-c14', 'g-d15'],
+    layout: 'cover',
+    seasons: ['autumn', 'spring'],
+    timesWorn: 7,
+    lastWorn: daysAgo(3, 20, 45),
+    createdAt: daysAgo(33),
+    favorite: true,
+  },
+  {
+    id: 'o-sundress-straw',
+    name: 'Sun & Sandals',
+    description: 'Tiered sundress, a wide-brim hat and strappy sandals with a crossbody.',
+    garmentIds: ['g-b15', 'g-d07', 'g-c15', 'g-d03'],
+    layout: 'grid',
+    seasons: ['summer'],
+    timesWorn: 6,
+    lastWorn: daysAgo(2, 13, 15),
+    createdAt: daysAgo(19),
+    favorite: true,
+  },
+  {
+    id: 'o-hoodie-run',
+    name: 'Easy Athleisure',
+    description: 'Zip hoodie, high-waist leggings, trainers and a cap. Coffee-run comfort.',
+    garmentIds: ['g-a15', 'g-b07', 'g-c11', 'g-d06'],
+    layout: 'grid',
+    seasons: ['spring', 'autumn'],
+    timesWorn: 15,
+    lastWorn: daysAgo(0, 7, 40),
+    createdAt: daysAgo(27),
+    favorite: false,
+  },
+  {
+    id: 'o-turtleneck-trench',
+    name: 'Trench Weather',
+    description: 'Cashmere turtleneck, mom jeans and a trench with a chunky scarf and boots.',
+    garmentIds: ['g-a14', 'g-b03', 'g-c01', 'g-d09', 'g-c12'],
+    layout: 'canvas',
+    seasons: ['autumn'],
+    timesWorn: 8,
+    lastWorn: daysAgo(6, 9, 10),
+    createdAt: daysAgo(40),
+    favorite: true,
+  },
+  {
+    id: 'o-wrap-camel',
+    name: 'Camel Wrap Office',
+    description: 'A crepe wrap dress under a camel coat, finished with loafers and a silk scarf.',
+    garmentIds: ['g-b14', 'g-c03', 'g-c17', 'g-d10'],
+    layout: 'cover',
+    seasons: ['autumn', 'winter'],
+    timesWorn: 3,
+    lastWorn: daysAgo(10, 8, 50),
+    createdAt: daysAgo(21),
+    favorite: false,
+  },
 ]
 
 export const MOCK_FEED: FeedEvent[] = [
@@ -618,6 +723,14 @@ export const MOCK_FEED: FeedEvent[] = [
   { id: 'f6', type: 'garment_created', refId: 'g-white-sneaker', at: daysAgo(1, 9, 3) },
   { id: 'f7', type: 'garment_created', refId: 'g-canvas-tote', at: daysAgo(1, 9, 1) },
   { id: 'f8', type: 'garment_worn', refId: 'g-charcoal-tee', at: daysAgo(3, 9, 0) },
+  { id: 'f9', type: 'outfit_worn', refId: 'o-hoodie-run', at: daysAgo(0, 7, 40) },
+  { id: 'f10', type: 'outfit_worn', refId: 'o-cotton-crew-denim', at: daysAgo(1, 9, 20) },
+  { id: 'f11', type: 'outfit_created', refId: 'o-lbd-biker', at: daysAgo(2, 18, 5) },
+  { id: 'f12', type: 'garment_created', refId: 'g-a11', at: daysAgo(2, 11, 12) },
+  { id: 'f13', type: 'outfit_worn', refId: 'o-sundress-straw', at: daysAgo(2, 13, 15) },
+  { id: 'f14', type: 'garment_created', refId: 'g-c07', at: daysAgo(4, 15, 30) },
+  { id: 'f15', type: 'outfit_created', refId: 'o-turtleneck-trench', at: daysAgo(4, 10, 0) },
+  { id: 'f16', type: 'garment_worn', refId: 'g-b16', at: daysAgo(3, 20, 45) },
 ]
 
 export const MOCK_WEATHER: Weather = {

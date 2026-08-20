@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  IconButton,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -18,7 +17,7 @@ import WaterDropRoundedIcon from '@mui/icons-material/WaterDropRounded'
 import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded'
 import WbTwilightRoundedIcon from '@mui/icons-material/WbTwilightRounded'
 import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded'
-import EditLocationAltRoundedIcon from '@mui/icons-material/EditLocationAltRounded'
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
 import { motion } from 'framer-motion'
 import { riseItem } from '@/theme/motion'
@@ -112,24 +111,33 @@ export function WeatherWidget() {
       </Box>
 
       <Stack sx={{ position: 'relative', height: '100%' }} spacing={2}>
-        {/* Header: location + change */}
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
-            <PlaceRoundedIcon fontSize="small" sx={{ opacity: 0.9 }} />
-            <Typography variant="overline" noWrap sx={{ opacity: 0.95, letterSpacing: 0.5 }}>
-              {location.name}
-              {location.country ? ` · ${location.country}` : ''}
-            </Typography>
-          </Stack>
-          <IconButton
-            size="small"
+        {/* Header: a clear, tappable location selector */}
+        <Box>
+          <Button
             onClick={() => setPickerOpen(true)}
+            startIcon={<PlaceRoundedIcon />}
+            endIcon={<ExpandMoreRoundedIcon />}
             aria-label="Change location"
-            sx={{ color: '#fff', opacity: 0.9, flexShrink: 0 }}
+            sx={{
+              maxWidth: '100%',
+              color: '#fff',
+              bgcolor: 'rgba(255,255,255,0.18)',
+              borderRadius: 999,
+              px: 1.5,
+              py: 0.5,
+              textTransform: 'none',
+              fontWeight: 700,
+              lineHeight: 1.2,
+              '& .MuiButton-endIcon': { ml: 0.25 },
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
+            }}
           >
-            <EditLocationAltRoundedIcon fontSize="small" />
-          </IconButton>
-        </Stack>
+            <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {location.name}
+              {location.country ? `, ${location.country}` : ''}
+            </Box>
+          </Button>
+        </Box>
 
         {status === 'error' ? (
           <Stack spacing={1.5} alignItems="flex-start" sx={{ py: 2 }}>

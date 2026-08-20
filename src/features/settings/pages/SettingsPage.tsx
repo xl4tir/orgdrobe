@@ -19,10 +19,16 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded'
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
+import PaletteRoundedIcon from '@mui/icons-material/PaletteRounded'
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
+import PlaceRoundedIcon from '@mui/icons-material/PlaceRounded'
+import LockResetRoundedIcon from '@mui/icons-material/LockResetRounded'
 import { PageContainer } from '@/components/ui/PageContainer'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { useAuthStore } from '@/features/auth/store'
 import { useColorMode } from '@/theme/ColorModeContext'
+import { useWeatherStore } from '@/features/dashboard/weatherStore'
+import { LocationPicker } from '@/features/dashboard/components/LocationPicker'
 import { initials } from '@/lib/format'
 
 function SettingsCard({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
@@ -44,15 +50,32 @@ export function SettingsPage() {
   const user = useAuthStore((s) => s.user)
   const updateUser = useAuthStore((s) => s.updateUser)
   const logout = useAuthStore((s) => s.logout)
-  const { mode, setMode } = useColorMode()
+  const { mode, setMode, design, setDesign } = useColorMode()
+  const location = useWeatherStore((s) => s.location)
 
   const [name, setName] = useState(user?.name ?? '')
   const [email, setEmail] = useState(user?.email ?? '')
+  const [newPassword, setNewPassword] = useState('')
+  const [repeatPassword, setRepeatPassword] = useState('')
   const [snack, setSnack] = useState<string | null>(null)
 
   const save = () => {
     updateUser({ name, email })
     setSnack('Settings saved')
+  }
+
+  const updatePassword = () => {
+    if (!newPassword || !repeatPassword) {
+      setSnack('Enter a new password twice')
+      return
+    }
+    if (newPassword !== repeatPassword) {
+      setSnack("Passwords don't match")
+      return
+    }
+    setNewPassword('')
+    setRepeatPassword('')
+    setSnack('Password updated')
   }
 
   return (
@@ -95,26 +118,90 @@ export function SettingsPage() {
           </Stack>
         </SettingsCard>
 
-        <SettingsCard title="Security" description="Update your password. Leave blank to keep the current one.">
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="New password" type="password" fullWidth autoComplete="new-password" />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField label="Repeat password" type="password" fullWidth autoComplete="new-password" />
-            </Grid>
-          </Grid>
+        <SettingsCard title="Location" description="Sets the city used for your weather forecast.">
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={1} alignItems="center" color="text.secondary">
+              <PlaceRoundedIcon fontSize="small" color="primary" />
+              <Typography variant="body1" color="text.primary">
+                {location.name}
+                {location.country ? (
+                  <Typography component="span" variant="body2" color="text.secondary">
+                    {' · '}
+                    {location.country}
+                  </Typography>
+                ) : null}
+              </Typography>
+            </Stack>
+            <LocationPicker onSelect={() => setSnack('Location updated')} />
+          </Stack>
         </SettingsCard>
 
         <SettingsCard title="Appearance" description="Choose how Роздягальня looks on this device.">
-          <ToggleButtonGroup exclusive value={mode} onChange={(_, v) => v && setMode(v)}>
-            <ToggleButton value="light" sx={{ px: 3, gap: 1 }}>
-              <LightModeRoundedIcon fontSize="small" /> Light
-            </ToggleButton>
-            <ToggleButton value="dark" sx={{ px: 3, gap: 1 }}>
-              <DarkModeRoundedIcon fontSize="small" /> Dark
-            </ToggleButton>
-          </ToggleButtonGroup>
+          <Stack spacing={3}>
+            <Stack spacing={1.5}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Theme
+              </Typography>
+              <ToggleButtonGroup exclusive value={mode} onChange={(_, v) => v && setMode(v)}>
+                <ToggleButton value="light" sx={{ px: 3, gap: 1 }}>
+                  <LightModeRoundedIcon fontSize="small" /> Light
+                </ToggleButton>
+                <ToggleButton value="dark" sx={{ px: 3, gap: 1 }}>
+                  <DarkModeRoundedIcon fontSize="small" /> Dark
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+            <Stack spacing={1.5}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Design
+              </Typography>
+              <ToggleButtonGroup exclusive value={design} onChange={(_, v) => v && setDesign(v)}>
+                <ToggleButton value="material" sx={{ px: 3, gap: 1 }}>
+                  <PaletteRoundedIcon fontSize="small" /> Material
+                </ToggleButton>
+                <ToggleButton value="editorial" sx={{ px: 3, gap: 1 }}>
+                  <AutoAwesomeRoundedIcon fontSize="small" /> Editorial
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Stack>
+          </Stack>
+        </SettingsCard>
+
+        <SettingsCard title="Security" description="Update your password. Leave blank to keep the current one.">
+          <Stack spacing={2.5}>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="New password"
+                  type="password"
+                  fullWidth
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Repeat password"
+                  type="password"
+                  fullWidth
+                  autoComplete="new-password"
+                  value={repeatPassword}
+                  onChange={(e) => setRepeatPassword(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+            <Box>
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<LockResetRoundedIcon />}
+                onClick={updatePassword}
+              >
+                Update password
+              </Button>
+            </Box>
+          </Stack>
         </SettingsCard>
 
         <SettingsCard title="Account">
